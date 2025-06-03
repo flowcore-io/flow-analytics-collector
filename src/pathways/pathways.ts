@@ -31,13 +31,18 @@ export const pathways = new PathwaysBuilder({
   .register({
     flowType: visitorContract.FlowcoreAnalytics.flowType,
     eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-    schema: EventVisitorTrackedEventSchema, // Schema validation handled by analytics service
+    // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
+    schema: EventVisitorTrackedEventSchema as any,
     writable: true,
   })
   .handle(
     `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
     // Type assertion needed for handler compatibility
-    handlerVisitorTracked as (event: { eventId: string; validTime: string; payload: unknown }) => Promise<void>
+    handlerVisitorTracked as (event: {
+      eventId: string;
+      validTime: string;
+      payload: unknown;
+    }) => Promise<void>
   );
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");

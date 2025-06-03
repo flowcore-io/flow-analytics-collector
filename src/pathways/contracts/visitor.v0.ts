@@ -8,18 +8,18 @@ export const FlowcoreAnalytics = {
 } as const;
 
 // Event schemas using Zod for validation
-export const EventVisitorTrackedEventSchema = z.object({
+export const EventVisitorTrackedEventSchema = z.strictObject({
   // Privacy-safe visitor identifier (daily rotating hash)
   visitorHash: z.string().length(64, "Visitor hash must be 64 characters"),
 
   // Page/Event details
   pathname: z.string().min(1, "Pathname is required"),
-  referrer: z.string(), // The page that linked to the current page
+  referrer: z.string().min(1, "Referrer is required"), // The page that linked to the current page
 
   // Session context (derived from hash, not personally identifiable)
   sessionContext: z
     .object({
-      dailySaltRotation: z.string(), // Date of current salt for debugging
+      dailySaltRotation: z.string().min(1, "Daily salt rotation is required"), // Date of current salt for debugging
     })
 });
 
@@ -30,18 +30,15 @@ export type EventVisitorTracked = z.infer<typeof EventVisitorTrackedEventSchema>
 export function createVisitorTrackedEvent(data: {
   visitorHash: string;
   pathname: string;
-  referrer?: string;
-  eventName?: string;
-  sessionContext?: {
+  referrer: string;
+  sessionContext: {
     dailySaltRotation: string;
   };
 }): EventVisitorTracked {
   return {
     visitorHash: data.visitorHash,
     pathname: data.pathname,
-    referrer: data.referrer ?? "",
-    sessionContext: data.sessionContext ?? {
-      dailySaltRotation: "",
-    },
+    referrer: data.referrer,
+    sessionContext: data.sessionContext,
   };
 }
