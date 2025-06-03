@@ -9,7 +9,7 @@ const envSchema = z.object({
   FLOWCORE_TENANT: z.string(),
   FLOWCORE_DATACORE: z.string().default("flow-analytics"),
   FLOWCORE_WEBHOOK_BASEURL: z.string().url(),
-  FLOWCORE_WEBHOOK_API_KEY: z.string(),
+  FLOWCORE_API_KEY: z.string(),
   FLOWCORE_TRANSFORMER_SECRET: z.string(),
 
   // Optional Redis for scaling (falls back to in-memory)
@@ -27,7 +27,7 @@ const env = envSchema.parse({
   FLOWCORE_TENANT: process.env.FLOWCORE_TENANT,
   FLOWCORE_DATACORE: process.env.FLOWCORE_DATACORE || "flow-analytics",
   FLOWCORE_WEBHOOK_BASEURL: process.env.FLOWCORE_WEBHOOK_BASEURL,
-  FLOWCORE_WEBHOOK_API_KEY: process.env.FLOWCORE_WEBHOOK_API_KEY,
+  FLOWCORE_API_KEY: process.env.FLOWCORE_API_KEY,
   FLOWCORE_TRANSFORMER_SECRET: process.env.FLOWCORE_TRANSFORMER_SECRET,
   REDIS_URL: process.env.REDIS_URL,
   POSTGRES_CONNECTION_STRING: process.env.POSTGRES_CONNECTION_STRING,

@@ -66,10 +66,6 @@ const app = new Elysia()
       body: t.Object({
         pathname: t.String({ minLength: 1, description: "Page pathname" }),
         referrer: t.Optional(t.String({ description: "Referrer URL" })),
-        eventName: t.Optional(t.String({ description: "Custom event name" })),
-        customProperties: t.Optional(
-          t.Record(t.String(), t.Unknown(), { description: "Custom event properties" })
-        ),
       }),
       tags: ["Analytics"],
       summary: "Track page view or custom event",

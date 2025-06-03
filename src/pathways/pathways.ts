@@ -23,7 +23,7 @@ export const pathways = new PathwaysBuilder({
   baseUrl: env.FLOWCORE_WEBHOOK_BASEURL,
   tenant: env.FLOWCORE_TENANT,
   dataCore: env.FLOWCORE_DATACORE,
-  apiKey: env.FLOWCORE_WEBHOOK_API_KEY,
+  apiKey: env.FLOWCORE_API_KEY,
   logger: noOpLogger,
   pathwayTimeoutMs: 30_000,
 })

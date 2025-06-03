@@ -53,8 +53,6 @@ export function extractAnalyticsInsights(payload: EventVisitorTracked) {
     isPageView: !payload.eventName || payload.eventName === "page_view",
     isCustomEvent: !!payload.eventName && payload.eventName !== "page_view",
     hasReferrer: !!payload.referrer,
-    hasCustomProperties:
-      !!payload.customProperties && Object.keys(payload.customProperties).length > 0,
     saltRotationDate: payload.sessionContext?.dailySaltRotation,
     eventType: payload.eventName || "page_view",
   };

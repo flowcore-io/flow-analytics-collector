@@ -14,15 +14,11 @@ export const EventVisitorTrackedSchema = z.object({
 
   // Page/Event details
   pathname: z.string().min(1, "Pathname is required"),
-  referrer: z.string().optional(),
+  referrer: z.string().optional(), // The page that linked to the current page
   eventName: z.string().optional(), // For custom events beyond page views
 
   // Metadata
-  timestamp: z.string().datetime(),
   userAgent: z.string().optional(), // Hashed, not stored raw
-
-  // Optional custom properties for advanced tracking
-  customProperties: z.record(z.string(), z.unknown()).optional(),
 
   // Session context (derived from hash, not personally identifiable)
   sessionContext: z
@@ -54,9 +50,7 @@ export function createVisitorTrackedEvent(data: {
     pathname: data.pathname,
     referrer: data.referrer,
     eventName: data.eventName,
-    timestamp: new Date().toISOString(),
     userAgent: data.userAgent,
-    customProperties: data.customProperties,
     sessionContext: data.sessionContext,
   };
 }
