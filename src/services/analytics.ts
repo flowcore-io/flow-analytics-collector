@@ -3,12 +3,12 @@ import { extractClientIP, generateVisitorHash } from "../lib/privacy";
 import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathways";
 
 // Input validation schema for incoming analytics events
-export const AnalyticsEventInputSchema = z.object({
+export const AnalyticsInputSchema = z.object({
   pathname: z.string().min(1, "Pathname is required"),
   referrer: z.string().optional(),
 });
 
-export type AnalyticsPageviewUserInput = z.infer<typeof AnalyticsEventInputSchema>;
+export type AnalyticsPageviewUserInput = z.infer<typeof AnalyticsInputSchema>;
 
 /**
  * Analytics service for processing and emitting visitor tracking events
@@ -18,13 +18,13 @@ export class AnalyticsService {
    * Process an analytics event from the browser
    * Generates privacy-safe visitor hash and emits to Flowcore
    */
-  async processPageviewEvent(
+  async processPageview(
     input: AnalyticsPageviewUserInput,
     headers: Record<string, string | undefined>
   ): Promise<{ success: true; eventId?: string } | { success: false; error: string }> {
     try {
       // Validate input
-      const validatedInput = AnalyticsEventInputSchema.parse(input);
+      const validatedInput = AnalyticsInputSchema.parse(input);
 
       // Extract privacy information
       const clientIP = extractClientIP(headers);
@@ -38,7 +38,6 @@ export class AnalyticsService {
         visitorHash,
         pathname: validatedInput.pathname,
         referrer: validatedInput.referrer,
-        userAgent: userAgent.substring(0, 100), // Truncate for storage efficiency
         sessionContext: {
           dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
         },

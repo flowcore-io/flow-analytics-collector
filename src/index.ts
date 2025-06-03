@@ -47,7 +47,7 @@ const app = new Elysia()
     "/api/pageview",
     async ({ body, headers, set }) => {
       try {
-        const result = await analyticsService.processPageviewEvent(body as AnalyticsPageviewUserInput, headers);
+        const result = await analyticsService.processPageview(body as AnalyticsPageviewUserInput, headers);
 
         if (result.success) {
           set.status = 204; // No Content - standard for analytics
@@ -66,19 +66,6 @@ const app = new Elysia()
       summary: "Track page view or custom event",
       description:
         "Accepts analytics events, generates privacy-safe visitor hash, and emits to Flowcore",
-    }
-  )
-
-  // Health check endpoint
-  .get(
-    "/healthz",
-    () => {
-      return { status: "ok" };
-    },
-    {
-      tags: ["Health"],
-      summary: "Health check",
-      description: "Returns service health status for load balancers",
     }
   )
 
