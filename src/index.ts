@@ -3,7 +3,6 @@ import swagger from "@elysiajs/swagger";
 import { Elysia, t } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
-import { pathwaysRouter } from "./pathways";
 import { AnalyticsService } from "./services/analytics";
 
 // Initialize services
@@ -139,51 +138,6 @@ const app = new Elysia()
       tags: ["Health"],
       summary: "Prometheus metrics",
       description: "Returns metrics in Prometheus format for monitoring systems",
-    }
-  )
-
-  // Flowcore transformer endpoint
-  .post(
-    "/api/transformer",
-    async ({ body, headers, set }) => {
-      try {
-        // Flowcore event structure - we'll use proper typing here
-        interface FlowcoreEvent {
-          eventId: string;
-          validTime: string;
-          flowType: string;
-          eventType: string;
-          payload: Record<string, unknown>;
-          timeBucket: string;
-          tenant: string;
-          dataCoreId: string;
-          metadata: Record<string, unknown>;
-        }
-
-        const event = body as FlowcoreEvent;
-        const secret = headers["x-secret"] ?? "";
-
-        console.log("📥 Received transformer event", {
-          flowType: event?.flowType,
-          eventType: event?.eventType,
-          eventId: event?.eventId,
-        });
-
-        await pathwaysRouter.processEvent(event, secret);
-
-        set.status = 200;
-        return { status: "ok" };
-      } catch (error) {
-        console.error("❌ Error in transformer:", error);
-        set.status = 500;
-        return { error: (error as Error).message };
-      }
-    },
-    {
-      body: t.Any(),
-      tags: ["Transformer"],
-      summary: "Flowcore transformer endpoint",
-      description: "Receives events from Flowcore transformers for local processing",
     }
   )
 
