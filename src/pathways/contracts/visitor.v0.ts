@@ -13,8 +13,8 @@ export const EventVisitorTrackedEventSchema = z.strictObject({
   visitorHash: z.string().length(64, "Visitor hash must be 64 characters"),
 
   // Page/Event details
-  pathname: z.string().min(1, "Pathname is required"),
-  referrer: z.string().min(1, "Referrer is required"), // The page that linked to the current page
+  pathname: z.string(),
+  referrer: z.string(), // The page that linked to the current page
 
   // Session context (derived from hash, not personally identifiable)
   sessionContext: z

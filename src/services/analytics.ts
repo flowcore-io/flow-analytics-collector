@@ -4,8 +4,8 @@ import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathw
 
 // Input validation schema for incoming analytics events
 export const AnalyticsPageviewInputSchema = z.strictObject({
-  pathname: z.string().min(1, "Pathname is required"),
-  referrer: z.string().min(1, "Referrer is required"),
+  pathname: z.string(),
+  referrer: z.string(),
 });
 
 export type AnalyticsPageviewUserInput = z.infer<typeof AnalyticsPageviewInputSchema>;
