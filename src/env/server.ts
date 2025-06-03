@@ -4,17 +4,17 @@ const envSchema = z.object({
   // Application Config
   PORT: z.string().default("3000"),
   SECRET_KEY: z.string().min(32, "SECRET_KEY must be at least 32 characters"),
-  
+
   // Flowcore Configuration
   FLOWCORE_TENANT: z.string(),
   FLOWCORE_DATACORE: z.string().default("flow-analytics"),
   FLOWCORE_WEBHOOK_BASEURL: z.string().url(),
   FLOWCORE_WEBHOOK_API_KEY: z.string(),
   FLOWCORE_TRANSFORMER_SECRET: z.string(),
-  
+
   // Optional Redis for scaling (falls back to in-memory)
   REDIS_URL: z.string().optional(),
-  
+
   // Database (for pathway state)
   POSTGRES_CONNECTION_STRING: z.string().optional(),
 });
@@ -33,4 +33,4 @@ const env = envSchema.parse({
   POSTGRES_CONNECTION_STRING: process.env.POSTGRES_CONNECTION_STRING,
 });
 
-export default env; 
+export default env;

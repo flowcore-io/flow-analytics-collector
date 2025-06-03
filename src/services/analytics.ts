@@ -1,6 +1,6 @@
-import { pathways, FlowcoreAnalytics, createVisitorTrackedEvent } from "../pathways";
-import { generateVisitorHash, extractClientIP } from "../lib/privacy";
 import { z } from "zod";
+import { extractClientIP, generateVisitorHash } from "../lib/privacy";
+import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathways";
 
 // Input validation schema for incoming analytics events
 export const AnalyticsEventInputSchema = z.object({
@@ -27,14 +27,14 @@ export class AnalyticsService {
     try {
       // Validate input
       const validatedInput = AnalyticsEventInputSchema.parse(input);
-      
+
       // Extract privacy information
       const clientIP = extractClientIP(headers);
-      const userAgent = headers['user-agent'] || 'unknown';
-      
+      const userAgent = headers["user-agent"] || "unknown";
+
       // Generate privacy-safe visitor hash
       const visitorHash = generateVisitorHash(clientIP, userAgent);
-      
+
       // Create the event
       const event = createVisitorTrackedEvent({
         visitorHash,
@@ -44,7 +44,7 @@ export class AnalyticsService {
         userAgent: userAgent.substring(0, 100), // Truncate for storage efficiency
         customProperties: validatedInput.customProperties,
         sessionContext: {
-          dailySaltRotation: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+          dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
         },
       });
 
@@ -53,27 +53,26 @@ export class AnalyticsService {
       await pathways.write(
         `${FlowcoreAnalytics.flowType}/${FlowcoreAnalytics.eventType.visitorTracked}`,
         {
-          data: event
+          data: event,
         }
       );
 
       console.log(`📊 Analytics event processed: ${validatedInput.pathname}`);
-      
+
       return { success: true };
-      
     } catch (error) {
-      console.error('❌ Error processing analytics event:', error);
-      
+      console.error("❌ Error processing analytics event:", error);
+
       if (error instanceof z.ZodError) {
-        return { 
-          success: false, 
-          error: `Validation error: ${error.errors.map(e => e.message).join(', ')}`
+        return {
+          success: false,
+          error: `Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
         };
       }
-      
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error'
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -83,11 +82,11 @@ export class AnalyticsService {
    */
   getHealthStatus() {
     return {
-      status: 'ok',
-      service: 'analytics',
+      status: "ok",
+      service: "analytics",
       pathwaysConfigured: true,
       flowType: FlowcoreAnalytics.flowType,
       eventTypes: Object.values(FlowcoreAnalytics.eventType),
     };
   }
-} 
+}

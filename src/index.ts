@@ -1,10 +1,10 @@
-import swagger from "@elysiajs/swagger";
 import cors from "@elysiajs/cors";
+import swagger from "@elysiajs/swagger";
 import { Elysia, t } from "elysia";
-import { AnalyticsService } from "./services/analytics";
-import { pathwaysRouter } from "./pathways";
-import { getSaltRotationInfo } from "./lib/privacy";
 import env from "./env/server";
+import { getSaltRotationInfo } from "./lib/privacy";
+import { pathwaysRouter } from "./pathways";
+import { AnalyticsService } from "./services/analytics";
 
 // Initialize services
 const analyticsService = new AnalyticsService();
@@ -51,12 +51,13 @@ const app = new Elysia()
         const result = await analyticsService.processEvent(body, headers);
 
         if (result.success) {
+          // Emit to Flowcore
+          await analyticsService.trackVisitor(result.data);
           set.status = 204; // No Content - standard for analytics
           return;
-        } else {
-          set.status = 400;
-          return { error: result.error };
         }
+        set.status = 400;
+        return { error: result.error };
       } catch (error) {
         console.error("Error in /api/event:", error);
         set.status = 500;
@@ -152,7 +153,16 @@ const app = new Elysia()
     "/api/transformer",
     async ({ body, headers, set }) => {
       try {
-        const event = body as any; // Type assertion for Flowcore event
+        // Flowcore event structure - we'll use proper typing here
+        interface FlowcoreEvent {
+          eventId: string;
+          validTime: string;
+          flowType: string;
+          eventType: string;
+          payload: Record<string, unknown>;
+        }
+
+        const event = body as FlowcoreEvent;
         const secret = headers["x-secret"] ?? "";
 
         console.log("📥 Received transformer event", {

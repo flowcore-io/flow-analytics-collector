@@ -11,24 +11,26 @@ export const FlowcoreAnalytics = {
 export const EventVisitorTrackedSchema = z.object({
   // Privacy-safe visitor identifier (daily rotating hash)
   visitorHash: z.string().length(64, "Visitor hash must be 64 characters"),
-  
+
   // Page/Event details
   pathname: z.string().min(1, "Pathname is required"),
   referrer: z.string().optional(),
   eventName: z.string().optional(), // For custom events beyond page views
-  
+
   // Metadata
   timestamp: z.string().datetime(),
   userAgent: z.string().optional(), // Hashed, not stored raw
-  
+
   // Optional custom properties for advanced tracking
   customProperties: z.record(z.string(), z.unknown()).optional(),
-  
+
   // Session context (derived from hash, not personally identifiable)
-  sessionContext: z.object({
-    isNewVisitor: z.boolean().optional(),
-    dailySaltRotation: z.string(), // Date of current salt for debugging
-  }).optional(),
+  sessionContext: z
+    .object({
+      isNewVisitor: z.boolean().optional(),
+      dailySaltRotation: z.string(), // Date of current salt for debugging
+    })
+    .optional(),
 });
 
 // Type exports
@@ -57,4 +59,4 @@ export function createVisitorTrackedEvent(data: {
     customProperties: data.customProperties,
     sessionContext: data.sessionContext,
   };
-} 
+}
