@@ -8,7 +8,7 @@ export const AnalyticsEventInputSchema = z.object({
   referrer: z.string().optional(),
 });
 
-export type AnalyticsEventInput = z.infer<typeof AnalyticsEventInputSchema>;
+export type AnalyticsPageviewEventInput = z.infer<typeof AnalyticsEventInputSchema>;
 
 /**
  * Analytics service for processing and emitting visitor tracking events
@@ -19,7 +19,7 @@ export class AnalyticsService {
    * Generates privacy-safe visitor hash and emits to Flowcore
    */
   async processEvent(
-    input: AnalyticsEventInput,
+    input: AnalyticsPageviewEventInput,
     headers: Record<string, string | undefined>
   ): Promise<{ success: true; eventId?: string } | { success: false; error: string }> {
     try {
