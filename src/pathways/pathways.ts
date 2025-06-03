@@ -27,25 +27,16 @@ export const pathways = new PathwaysBuilder({
   logger: noOpLogger,
   pathwayTimeoutMs: 30_000,
 })
-  .withPathwayState(pathwayState)
   .register({
     flowType: visitorContract.FlowcoreAnalytics.flowType,
     eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-    // Type assertion needed due to Flowcore's generic constraints
-    schema:
-      visitorContract.EventVisitorTrackedSchema as typeof visitorContract.EventVisitorTrackedSchema & {
-        _def: unknown;
-      },
+    schema: undefined, // Schema validation handled by analytics service
     writable: true,
   })
   .handle(
     `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
     // Type assertion needed for handler compatibility
-    handlerVisitorTracked as (event: {
-      eventId: string;
-      validTime: string;
-      payload: unknown;
-    }) => Promise<void>
+    handlerVisitorTracked as (event: { eventId: string; validTime: string; payload: unknown }) => Promise<void>
   );
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");

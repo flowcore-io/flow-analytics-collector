@@ -51,8 +51,6 @@ const app = new Elysia()
         const result = await analyticsService.processEvent(body, headers);
 
         if (result.success) {
-          // Emit to Flowcore
-          await analyticsService.trackVisitor(result.data);
           set.status = 204; // No Content - standard for analytics
           return;
         }
@@ -160,6 +158,10 @@ const app = new Elysia()
           flowType: string;
           eventType: string;
           payload: Record<string, unknown>;
+          timeBucket: string;
+          tenant: string;
+          dataCoreId: string;
+          metadata: Record<string, unknown>;
         }
 
         const event = body as FlowcoreEvent;
