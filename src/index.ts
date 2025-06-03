@@ -150,5 +150,3 @@ const app = new Elysia()
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 console.log(`📖 API Documentation: http://localhost:${env.PORT}/swagger`);
-console.log(`🔗 Analytics endpoint: http://localhost:${env.PORT}/api/event`);
-console.log(`💓 Health check: http://localhost:${env.PORT}/healthz`);

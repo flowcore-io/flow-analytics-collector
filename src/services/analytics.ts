@@ -22,6 +22,7 @@ export class AnalyticsService {
     input: AnalyticsPageviewUserInput,
     headers: Record<string, string | undefined>
   ): Promise<{ success: true; eventId?: string } | { success: false; error: string }> {
+    console.log("🔍 Processing pageview:", input);
     try {
       // Validate input
       const validatedInput = AnalyticsPageviewInputSchema.parse(input);

@@ -168,12 +168,6 @@
                 showStatus(`❌ Health check failed: ${error.message}`, 'error');
             }
         }
-
-        // Automatically track pageview on load
-        window.addEventListener('load', () => {
-            showStatus('🚀 Page loaded - tracking automatic pageview...', 'info');
-            trackPageview();
-        });
     </script>
 </body>
 </html> 
