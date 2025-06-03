@@ -5,10 +5,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "flowcore:apply:production": "flowcore apply -f flowcore.yaml",
-    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
-    "flowcore:stream": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
-    "flowcore:backfill": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
+    "lint": "biome lint src/",
+    "lint:fix": "biome lint --write src/",
+    "format": "biome format src/",
+    "format:fix": "biome format --write src/",
+    "check": "biome check src/",
+    "check:fix": "biome check --write src/",
+    "flowcore:apply:production": "flowcore apply -f flowcore.yml",
+    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yml -f flowcore.local.yml",
+    "flowcore:stream": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
+    "flowcore:backfill": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
@@ -22,6 +28,7 @@
     "zod": "^3.25.49"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "bun-types": "latest"
   },
   "module": "src/index.js"
