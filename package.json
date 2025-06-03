@@ -3,11 +3,23 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "flowcore:apply:production": "flowcore apply -f flowcore.yml",
+    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yml -f flowcore.local.yml",
+    "flowcore:stream": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
+    "flowcore:backfill": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.3.3",
     "@elysiajs/swagger": "^1.3.0",
-    "elysia": "latest"
+    "@flowcore/data-pump": "npm:@jsr/flowcore__data-pump",
+    "@flowcore/pathways": "npm:@jsr/flowcore__pathways",
+    "@flowcore/sdk": "npm:@jsr/flowcore__sdk",
+    "@sinclair/typebox": "^0.34.33",
+    "crypto": "^1.0.1",
+    "elysia": "latest",
+    "zod": "^3.25.49"
   },
   "devDependencies": {
     "bun-types": "latest"
