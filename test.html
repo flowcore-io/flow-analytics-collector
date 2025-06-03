@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowcore Analytics Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+        code {
+            background: #f1f3f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦊 Flowcore Analytics Test Page</h1>
+    
+    <div class="container">
+        <h2>Analytics Collection Test</h2>
+        <p>This page demonstrates the Flowcore Analytics Collector. It automatically tracks a pageview when loaded and provides buttons to test manual tracking.</p>
+        
+        <div>
+            <strong>Current Page:</strong> <code id="current-path"></code><br>
+            <strong>Referrer:</strong> <code id="current-referrer"></code><br>
+            <strong>API Endpoint:</strong> <code>http://localhost:3000/api/pageview</code>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>Manual Tracking</h3>
+        <button onclick="trackPageview()">Track Current Page</button>
+        <button onclick="trackCustomPage()">Track Custom Page</button>
+        <button onclick="checkHealth()">Check API Health</button>
+    </div>
+
+    <div id="status-container"></div>
+
+    <div class="container">
+        <h3>Privacy Notice</h3>
+        <p>This analytics system is privacy-first:</p>
+        <ul>
+            <li>Your IP address and User Agent are hashed with a daily rotating salt</li>
+            <li>No personally identifiable information is stored</li>
+            <li>The visitor hash changes every day for privacy protection</li>
+            <li>Only page paths and referrer information are tracked</li>
+        </ul>
+    </div>
+
+    <script>
+        // Analytics configuration
+        const ANALYTICS_API = 'http://localhost:3000/api/pageview';
+        const HEALTH_API = 'http://localhost:3000/health';
+
+        // Update page info
+        document.getElementById('current-path').textContent = window.location.pathname;
+        document.getElementById('current-referrer').textContent = document.referrer || '(none)';
+
+        // Utility function to show status messages
+        function showStatus(message, type = 'info') {
+            const container = document.getElementById('status-container');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.innerHTML = message;
+            container.appendChild(statusDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                statusDiv.remove();
+            }, 5000);
+        }
+
+        // Track a pageview
+        async function trackPageview(pathname = window.location.pathname, referrer = document.referrer) {
+            try {
+                showStatus('📊 Sending analytics event...', 'info');
+                
+                const response = await fetch(ANALYTICS_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pathname: pathname,
+                        referrer: referrer || undefined
+                    })
+                });
+
+                if (response.ok) {
+                    showStatus(`✅ Successfully tracked pageview: ${pathname}`, 'success');
+                } else {
+                    const error = await response.text();
+                    showStatus(`❌ Failed to track pageview: ${response.status} - ${error}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Track a custom page for testing
+        async function trackCustomPage() {
+            const customPath = prompt('Enter a custom page path to track:', '/custom-test-page');
+            if (customPath) {
+                await trackPageview(customPath, window.location.pathname);
+            }
+        }
+
+        // Check API health
+        async function checkHealth() {
+            try {
+                showStatus('🔍 Checking API health...', 'info');
+                
+                const response = await fetch(HEALTH_API);
+                
+                if (response.ok) {
+                    const health = await response.json();
+                    showStatus(`✅ API is healthy - Tenant: ${health.environment?.tenant}, Flow: ${health.flowType}`, 'success');
+                } else {
+                    showStatus(`❌ API health check failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Health check failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Automatically track pageview on load
+        window.addEventListener('load', () => {
+            showStatus('🚀 Page loaded - tracking automatic pageview...', 'info');
+            trackPageview();
+        });
+    </script>
+</body>
+</html> 
