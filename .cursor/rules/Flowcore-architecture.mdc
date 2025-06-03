@@ -37,20 +37,20 @@ This project uses a **multi-file configuration approach** for different environm
 ### Core Configuration Files
 
 ```
-flowcore.yml                    # Production configuration
-flowcore.local.yml              # Local environment overrides  
-flowcore.local.development.yml  # Local development proxy endpoints
+flowcore.yaml                    # Production configuration
+flowcore.local.yaml              # Local environment overrides  
+flowcore.local.development.yaml  # Local development proxy endpoints
 ```
 
 ### File Purposes
 
-- **`flowcore.yml`**: Production configuration with all flow types, transformers, and scenarios
-- **`flowcore.local.yml`**: Minimal file that overrides tenant for local development
-- **`flowcore.local.development.yml`**: Development proxy endpoints for local event streaming
+- **`flowcore.yaml`**: Production configuration with all flow types, transformers, and scenarios
+- **`flowcore.local.yaml`**: Minimal file that overrides tenant for local development
+- **`flowcore.local.development.yaml`**: Development proxy endpoints for local event streaming
 
 ### Example Structure
 
-**flowcore.yml** (Production):
+**flowcore.yaml** (Production):
 ```yaml
 tenant: speedlocal
 dataCore:
@@ -89,12 +89,12 @@ dataCore:
     # ... other flow types (dataset.0, duckdb.0, job.0, system.0)
 ```
 
-**flowcore.local.yml** (Local Override):
+**flowcore.local.yaml** (Local Override):
 ```yaml
 tenant: jbiskur
 ```
 
-**flowcore.local.development.yml** (Development Proxies):
+**flowcore.local.development.yaml** (Development Proxies):
 ```yaml
 development:
   proxyEndpoints:
@@ -401,11 +401,11 @@ Add these scripts to your `package.json` for Flowcore development:
 ```json
 {
   "scripts": {
-    "flowcore:apply:production": "flowcore apply -f flowcore.yml",
-    "flowcore:apply:staging": "flowcore apply -f flowcore.yml -f flowcore.staging.yml", 
-    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yml -f flowcore.local.yml",
-    "flowcore:stream": "env-cmd -x flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -s now -e http://localhost:3000/api/transform -H \"X-Secret: \\$FLOWCORE_TRANSFORMER_SECRET\"",
-    "flowcore:backfill": "env-cmd -x flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -z 5 -e http://localhost:3000/api/transform -H \"X-Secret: \\$FLOWCORE_TRANSFORMER_SECRET\""
+    "flowcore:apply:production": "flowcore apply -f flowcore.yaml",
+    "flowcore:apply:staging": "flowcore apply -f flowcore.yaml -f flowcore.staging.yml", 
+    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
+    "flowcore:stream": "env-cmd -x flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transform -H \"X-Secret: \\$FLOWCORE_TRANSFORMER_SECRET\"",
+    "flowcore:backfill": "env-cmd -x flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transform -H \"X-Secret: \\$FLOWCORE_TRANSFORMER_SECRET\""
   },
   "devDependencies": {
     "env-cmd": "^10.1.0"
@@ -856,10 +856,10 @@ For file events, use the `isFilePathway` flag:
 - This creates proper event-driven architecture
 
 ### 4. Multi-File Configuration
-- Use separate flowcore.yml files for different environments
-- Keep production configuration complete in main flowcore.yml
-- Use flowcore.local.yml for simple tenant overrides
-- Use flowcore.local.development.yml for development proxy endpoints
+- Use separate flowcore.yaml files for different environments
+- Keep production configuration complete in main flowcore.yaml
+- Use flowcore.local.yaml for simple tenant overrides
+- Use flowcore.local.development.yaml for development proxy endpoints
 
 ### 5. Flow Type Organization
 - Split events into logical domain-specific flow types
@@ -891,7 +891,7 @@ For file events, use the `isFilePathway` flag:
 1. **Define Event Contract**: Create schema and types in `contracts/{flowType}.ts`
 2. **Implement Handlers**: Create business logic in `contracts/{flowType}.handlers.ts`
 3. **Register in Router**: Add to main `pathways.ts` configuration
-4. **Configure Flowcore**: Update `flowcore.yml` with transformer configuration
+4. **Configure Flowcore**: Update `flowcore.yaml` with transformer configuration
 5. **Update Service Layer**: Modify services to send events to pathways
 6. **Test Locally**: Use development scripts to stream events
 7. **Deploy**: Apply configuration to production environment

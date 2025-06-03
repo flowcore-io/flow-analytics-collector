@@ -44,7 +44,7 @@ Required environment variables:
 
 ### 3. Set Up Flowcore Resources
 
-Update `flowcore.yml` and `flowcore.local.yml` with your tenant information, then create the data core:
+Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant information, then create the data core:
 
 ```bash
 bun run flowcore:apply:dev
@@ -269,9 +269,9 @@ Set up alerts for:
 
 ## Configuration Files
 
-- `flowcore.yml`: Production Flowcore configuration
-- `flowcore.local.yml`: Local tenant override
-- `flowcore.local.development.yml`: Development proxy endpoints
+- `flowcore.yaml`: Production Flowcore configuration
+- `flowcore.local.yaml`: Local tenant override
+- `flowcore.local.development.yaml`: Development proxy endpoints
 - `env.example`: Environment variables template
 
 ## Project Structure
