@@ -6,8 +6,6 @@ import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathw
 export const AnalyticsEventInputSchema = z.object({
   pathname: z.string().min(1, "Pathname is required"),
   referrer: z.string().optional(),
-  eventName: z.string().optional(),
-  customProperties: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type AnalyticsEventInput = z.infer<typeof AnalyticsEventInputSchema>;
@@ -40,9 +38,7 @@ export class AnalyticsService {
         visitorHash,
         pathname: validatedInput.pathname,
         referrer: validatedInput.referrer,
-        eventName: validatedInput.eventName,
         userAgent: userAgent.substring(0, 100), // Truncate for storage efficiency
-        customProperties: validatedInput.customProperties,
         sessionContext: {
           dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
         },

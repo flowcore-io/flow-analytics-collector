@@ -1,9 +1,9 @@
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
-import { AnalyticsService } from "./services/analytics";
+import { type AnalyticsEventInput, AnalyticsEventInputSchema, AnalyticsService } from "./services/analytics";
 
 // Initialize services
 const analyticsService = new AnalyticsService();
@@ -44,10 +44,10 @@ const app = new Elysia()
 
   // Main analytics event collection endpoint
   .post(
-    "/api/event",
+    "/api/pageview",
     async ({ body, headers, set }) => {
       try {
-        const result = await analyticsService.processEvent(body, headers);
+        const result = await analyticsService.processEvent(body as AnalyticsEventInput, headers);
 
         if (result.success) {
           set.status = 204; // No Content - standard for analytics
@@ -62,10 +62,7 @@ const app = new Elysia()
       }
     },
     {
-      body: t.Object({
-        pathname: t.String({ minLength: 1, description: "Page pathname" }),
-        referrer: t.Optional(t.String({ description: "Referrer URL" })),
-      }),
+      body: AnalyticsEventInputSchema,
       tags: ["Analytics"],
       summary: "Track page view or custom event",
       description:
