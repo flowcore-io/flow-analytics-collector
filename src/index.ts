@@ -3,7 +3,7 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
-import { type AnalyticsEventInput, AnalyticsEventInputSchema, AnalyticsService } from "./services/analytics";
+import { type AnalyticsEventInput, AnalyticsService } from "./services/analytics";
 
 // Initialize services
 const analyticsService = new AnalyticsService();
@@ -62,7 +62,6 @@ const app = new Elysia()
       }
     },
     {
-      body: AnalyticsEventInputSchema,
       tags: ["Analytics"],
       summary: "Track page view or custom event",
       description:
