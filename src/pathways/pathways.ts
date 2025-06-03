@@ -5,7 +5,6 @@ import env from "../env/server";
 // Import contracts and handlers
 import * as visitorContract from "./contracts/visitor.v0";
 import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
-import { handlerVisitorTracked } from "./contracts/visitor.v0.handlers";
 
 // Create pathway state (in-memory for now)
 const pathwayState = undefined;
@@ -27,23 +26,22 @@ export const pathways = new PathwaysBuilder({
   apiKey: env.FLOWCORE_API_KEY,
   logger: noOpLogger,
   pathwayTimeoutMs: 30_000,
-})
-  .register({
-    flowType: visitorContract.FlowcoreAnalytics.flowType,
-    eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-    // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
-    schema: EventVisitorTrackedEventSchema as any,
-    writable: true,
-  })
-  .handle(
-    `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
-    // Type assertion needed for handler compatibility
-    handlerVisitorTracked as (event: {
-      eventId: string;
-      validTime: string;
-      payload: unknown;
-    }) => Promise<void>
-  );
+}).register({
+  flowType: visitorContract.FlowcoreAnalytics.flowType,
+  eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
+  // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
+  schema: EventVisitorTrackedEventSchema as any,
+  writable: true,
+});
+// .handle(
+//   `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
+//   // Type assertion needed for handler compatibility
+//   handlerVisitorTracked as (event: {
+//     eventId: string;
+//     validTime: string;
+//     payload: unknown;
+//   }) => Promise<void>
+// );
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");
 
