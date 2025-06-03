@@ -1,0 +1,159 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Product Requirements Document: flowcore-analytics-collector
+Product Overview
+Product Title: flowcore-analytics-collector
+Version: v1
+Product Summary: An Elysia.js–based API that accepts lightweight page-view and custom-event payloads from browsers, computes a daily salted hash of IP + User-Agent for privacy-safe visitor identification, and emits each hit to Flowcore's immutable event log. It manages salt rotation automatically at midnight, so each "visitor ID" lasts only for the current day without storing raw IPs. Designed as a minimal, framework-agnostic service, it ensures GDPR-compliant analytics ingestion with no external dependencies.
+Goals
+Business Goals
+Enable GDPR-compliant, privacy-first analytics ingestion without storing raw IPs or personal identifiers
+Reduce infrastructure overhead by centralizing event capture through a lightweight, Flowcore-powered collector rather than maintaining custom Kafka or CDC pipelines
+Provide a building block for a broader analytics platform that can drive data-driven decisions, inform product roadmap prioritization, and, over time, support premium insights or subscription revenue streams
+User Goals
+Developer Implementing the Collector: Quickly integrate analytics with minimal configuration, rely on turnkey hashing logic for privacy, and trust that all events reach Flowcore reliably without building extra backend infrastructure
+Website Visitor: Experience fast page loads and no intrusive cookies or tracking banners, while knowing that their privacy is protected by hashing and daily salt rotation
+Data Analyst: Access accurate, aggregated page-view and unique-visitor metrics in real time, easily backfill historical data via Flowcore's replay, and avoid manual ETL or database scripting
+Non-Goals (Out of Scope for v1)
+Providing a full-featured dashboard or UI; v1 focuses solely on event collection and emission to Flowcore
+Detailed user profiling, session replay, or funnel analysis; v1 will not store raw events or persistent identifiers beyond the daily hash
+Custom reporting or advanced segmentation; downstream analytics tools will handle those use cases once data arrives in Flowcore projections
+User Personas
+Frontend/Fullstack Developer (Implementing the Collector)
+This persona is typically a mid- to senior-level engineer who works on both client-side code and backend services. They are comfortable writing JavaScript or TypeScript, and they often use frameworks such as React, Vue, Next.js, or plain HTML/CSS/JS for the frontend. On the server side, they may code in Node.js, Bun, or Elysia.js and rely on tools like GitHub, Docker, and CI/CD pipelines. Their main pain points with existing analytics solutions include heavyweight SDKs that bloat page bundles, complex server setups (Kafka topics, Redis caches, or custom ETL jobs), and cumbersome cookie-consent flows. They prefer drop-in integrations: they like tiny, self-contained scripts and simple API endpoints that they can paste into their code, then forget about.
+Data Analyst/Product Manager (Consuming the Analytics Data)
+This persona is moderately technical but does not write production code. They are fluent in SQL or a BI tool (Looker, Metabase, or Tableau) and expect to explore page-view trends, unique-visitor counts, and referral sources without needing to manage ETL scripts or data pipelines. Their primary questions are: "How many unique visitors arrived yesterday?" "Which pages drove conversions?" and "What was the trend in weekly retention?" They rely on dashboards or ad-hoc SQL queries against an aggregated projection table (hosted in ClickHouse or Postgres) and want consistent, up-to-date numbers.
+Website Visitor (The End User Being Tracked)
+This persona is anyone who navigates to the site—on desktop or mobile—using a modern browser (Chrome, Safari, Firefox, Edge). They are highly privacy conscious and expect no third-party tracking, no persistent cookies, and no fingerprinting. They want fast page loads, no annoying consent banners, and confidence that their personal data is not being stored permanently. Because the collector uses a daily, salted IP/U-A hash on the server, raw IPs and full User-Agents are never written to disk.
+DevOps/Platform Engineer
+Responsible for deploying and monitoring the collector and the downstream projection infrastructure. They know Docker, Kubernetes, or other hosting solutions and need health checks, metrics, and alerts for the collector service. They use tools like Prometheus and Grafana to ensure the collector is ingesting events at expected rates and that the daily salt rotates correctly. Their main concern is reliability and scalability under traffic spikes.
+Functional Requirements
+Core API Endpoints
+POST /api/event: Accepts JSON payloads from the browser, minimally { pathname, referrer, eventName? }. Returns HTTP 204 on success, HTTP 400 for malformed payloads. Includes CORS headers for cross-domain access.
+GET /healthz: Returns HTTP 200 with { status: "ok" } for load balancer health checks
+GET /metrics (Optional): Exposes basic statistics (total events received, hashing errors, salt generation timestamp) for monitoring systems
+Event Processing Logic
+Parse & validate incoming JSON payloads
+Extract client IP from X-Forwarded-For, X-Real-IP, or CF-Connecting-IP headers
+Generate daily salt using sha256(today + SECRET_KEY)
+Compute uaHash = sha256(IP + User-Agent + dailySalt)
+Construct event payload with pathname, referrer, uaHash, timestamp, and optional eventName
+Emit to Flowcore using idempotent writes with retry logic
+Return HTTP 204 on success, HTTP 500 on emission failure
+Privacy & Hashing
+Generate new 256-bit salt daily at midnight UTC
+Rotate salt automatically using date + SECRET_KEY derivation
+Never store raw IP addresses or User-Agent strings
+Hash becomes irreversible after 24 hours due to salt rotation
+Flowcore Integration
+Use Flowcore Pathways SDK to emit events as "analytics.v0/page.view.v0"
+Include idempotency keys to prevent duplicate events
+Implement retry logic with exponential backoff for transient failures
+Validate events against Zod schemas before emission
+Configuration & Deployment
+Environment variables: SECRET_KEY, FLOWCORE_API_KEY, PORT, optional REDIS_URL
+Docker containerization with health check endpoint
+Support for Kubernetes deployment with readiness/liveness probes
+Stateless design for horizontal scaling
+Monitoring & Health
+Prometheus-compatible metrics endpoint
+Structured logging without raw IP/UA data
+Health checks for both service availability and Flowcore connectivity
+Alerting on error rates, salt rotation failures, and Flowcore write issues
+User Experience
+Entry Points
+Developers discover the collector when searching for lightweight, privacy-focused analytics solutions. They land on GitHub documentation with a clear "Getting Started" guide showing how to drop in a single script and begin capturing events within minutes.
+Core User Flows
+Frontend Integration: Add analytics.js script, configure endpoint URL, validate delivery via browser DevTools
+Data Analyst Experience: Query aggregated metrics from projection database using SQL or BI tools
+DevOps Deployment: Deploy via Docker/Kubernetes, configure health checks and monitoring, scale horizontally as needed
+Advanced Features
+Custom event tracking beyond pageviews
+Debugging tools for troubleshooting failed events
+Performance optimization for high-traffic scenarios
+UI/UX Highlights
+Simple code snippets that fit in a few lines
+Clear error messages with specific field validation
+Interactive documentation with copy-to-clipboard examples
+Dark-mode support for developer-friendly experience
+Narrative
+Problem Statement
+Today's teams wrestle with a stark trade-off: either deploy monolithic analytics platforms that bloat pages and risk cookie-consent headaches, or cobble together custom pipelines that require Kafka clusters, CDC connectors, and nightly ETL jobs. Meanwhile, privacy regulations demand that no raw IPs or personal data ever be persisted, forcing additional engineering work to anonymize or purge logs.
+Vision of Success
+Imagine a world where capturing page views and custom events is no more work than adding a tiny script to your site. When a user visits, their browser hits a simple API endpoint that instantly hashes IP and User-Agent, preserving privacy by design. Behind the scenes, a global event log stores only those hashed values and minimal metadata, enabling real-time analytics without compliance risk.
+Market Context
+The analytics landscape is shifting under intense regulatory pressure and changing customer expectations. GDPR, CCPA, and evolving privacy standards make cookie-based tracking untenable. Our collector sits at the intersection of privacy-first analytics and minimal operational overhead.
+Competitive Advantage
+What sets our approach apart is its simplicity and privacy foundation. By design, every page view is hashed with a rotating daily salt before being written to the event log—no raw IPs, no personal data, no cookie consent pop-ups. This combination of plug-and-play simplicity, instantaneous fan-out, and strict privacy safeguards creates a product that developers can adopt quickly, analysts can trust, and compliance teams can approve without custom audits.
+Future Possibilities
+Once this collector becomes the default event source, advanced capabilities become possible: real-time A/B testing, dynamic feature flags, client-side personalization, and premium analytics features—all powered by the same privacy-first event log.
+Success Metrics
+User Metrics
+Developer Adoption Rate: 20% of target projects integrate within 30 days
+Integration Success Rate: 95% of integrations receive HTTP 204 within 15 minutes
+Time-to-First-Event: 95% of developers send first valid event within 10 minutes
+User Retention: 80% of Week 1 integrations continue daily usage through Week 5
+Business Metrics
+Infrastructure Cost Reduction: 30% reduction in pipeline costs within first quarter
+Compliance Risk Reduction: Zero privacy incidents in first year
+Competitive Positioning: 20% QoQ increase in GitHub stars or 15% increase in trial sign-ups
+Platform Benefits: 3+ new Flowcore capabilities enabled within 6 months
+Technical Metrics
+API Latency: p50 ≤ 50ms, p95 ≤ 150ms, p99 ≤ 250ms
+Throughput: 2,000+ EPS on standard container
+Reliability: 99.9% monthly uptime
+Error Rate: <0.1% total error rate daily
+Data Quality: 99% of events appear in projections within 60 seconds
+Technical Considerations
+Integration Points
+Flowcore API: Reliable event emission using Pathways SDK with idempotency and retry logic
+Browser Integration: Lightweight analytics.js snippet with CORS support and no blocking behavior
+Downstream Consumers: Projection stores (Postgres/ClickHouse) via Flowcore transformers
+Privacy & Security
+Salt Management: Daily UTC rotation using date + SECRET_KEY derivation
+Hash Collision Handling: Astronomically unlikely with SHA-256; acceptable false positives
+Security Hardening: HTTPS-only, input validation, rate limiting, secrets management
+Data Retention: Configurable via Flowcore retention policies
+Scalability & Performance
+Horizontal Scaling: Stateless design with shared salt via Redis or consistent derivation
+Database Strategy: Partitioned projection tables, Redis for rate limiting and deduplication
+Traffic Management: IP/uaHash-based rate limiting with Redis token buckets
+Implementation Challenges
+Hash Performance: Consider native optimizations for >10k EPS scenarios
+Flowcore Backpressure: Queue management with circuit breakers and overflow handling
+Salt Coordination: Race condition prevention via Redis locks or centralized management
+Monitoring: Distributed tracing, structured logging, comprehensive alerting
+Milestones & Sequencing
+Development Timeline
+Total Duration: Few hours (single developer)
+Team Requirements
+Single Backend Engineer: Node.js/Bun expertise, Elysia.js experience, Flowcore SDK knowledge
+Critical Dependencies
+Flowcore dev environment access and API keys
+Event schema agreement (Flow-Type and eventType names)
+Salt storage strategy decision (in-memory vs. Redis)
+Basic projection store setup for testing
+Risks & Dependencies
+Flowcore API Changes: Mitigation via API changelog tracking and integration tests
+Salt Rotation Consistency: Mitigation via Redis coordination or centralized management
+Service Dependencies: Circuit breakers and fallback mechanisms for Flowcore/Redis outages
+User Stories
+Frontend Developer
+As a Frontend Developer, I want a drop-in script that emits events with one line of code so that I can integrate analytics quickly without learning new frameworks
+As a Frontend Developer, I want clear error messages when events fail so that I can debug integration issues without guessing
+As a Frontend Developer, I want to track custom events via a simple API so that I can measure feature engagement without adding extra code
+Data Analyst
+As a Data Analyst, I want aggregated metrics available in real time so that I can generate reports without waiting for overnight ETL
+As a Data Analyst, I want replay capability for historical data so that I can run new analyses on past events without manual migrations
+As a Data Analyst, I want to query by event type and date via SQL so that I can build custom dashboards without complex joins
+DevOps Engineer
+As a DevOps Engineer, I want health-check endpoints and Prometheus metrics so that I can monitor collector performance in my existing observability stack
+As a DevOps Engineer, I want Docker images and Kubernetes manifests so that I can deploy with minimal configuration and ensure scalability
+As a DevOps Engineer, I want automatic salt rotation and fallback logic so that I can guarantee privacy compliance without manual intervention
+Website Visitor
+As a Website Visitor, I want my browsing to remain fast and unobtrusive so that analytics do not slow down the site
+As a Website Visitor, I want no cookies or persistent identifiers so that my privacy is protected by default
+As a Website Visitor, I want assurance that my personal data is never saved so that I can trust the site's privacy commitment
