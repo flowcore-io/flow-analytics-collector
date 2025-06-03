@@ -4,6 +4,7 @@ import env from "../env/server";
 
 // Import contracts and handlers
 import * as visitorContract from "./contracts/visitor.v0";
+import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
 import { handlerVisitorTracked } from "./contracts/visitor.v0.handlers";
 
 // Create pathway state (in-memory for now)
@@ -30,7 +31,7 @@ export const pathways = new PathwaysBuilder({
   .register({
     flowType: visitorContract.FlowcoreAnalytics.flowType,
     eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-    schema: undefined, // Schema validation handled by analytics service
+    schema: EventVisitorTrackedEventSchema, // Schema validation handled by analytics service
     writable: true,
   })
   .handle(

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { extractClientIP, generateVisitorHash } from "../lib/privacy";
 import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathways";
 
@@ -61,7 +61,7 @@ export class AnalyticsService {
       if (error instanceof z.ZodError) {
         return {
           success: false,
-          error: `Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
+          error: `Validation error: ${error.issues.map((e: { message: string }) => e.message).join(", ")}`,
         };
       }
 

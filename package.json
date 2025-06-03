@@ -25,7 +25,7 @@
     "@sinclair/typebox": "^0.34.33",
     "crypto": "^1.0.1",
     "elysia": "latest",
-    "zod": "^3.25.49"
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

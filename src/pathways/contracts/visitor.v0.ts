@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const FlowcoreAnalytics = {
   flowType: "visitor.v0",
@@ -8,7 +8,7 @@ export const FlowcoreAnalytics = {
 } as const;
 
 // Event schemas using Zod for validation
-export const EventVisitorTrackedSchema = z.object({
+export const EventVisitorTrackedEventSchema = z.object({
   // Privacy-safe visitor identifier (daily rotating hash)
   visitorHash: z.string().length(64, "Visitor hash must be 64 characters"),
 
@@ -24,7 +24,7 @@ export const EventVisitorTrackedSchema = z.object({
 });
 
 // Type exports
-export type EventVisitorTracked = z.infer<typeof EventVisitorTrackedSchema>;
+export type EventVisitorTracked = z.infer<typeof EventVisitorTrackedEventSchema>;
 
 // Helper function to create a visitor tracked event
 export function createVisitorTrackedEvent(data: {
