@@ -3,7 +3,7 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
-import { type AnalyticsPageviewEventInput, AnalyticsService } from "./services/analytics";
+import { type AnalyticsPageviewUserInput, AnalyticsService } from "./services/analytics";
 
 // Initialize services
 const analyticsService = new AnalyticsService();
@@ -47,7 +47,7 @@ const app = new Elysia()
     "/api/pageview",
     async ({ body, headers, set }) => {
       try {
-        const result = await analyticsService.processEvent(body as AnalyticsPageviewEventInput, headers);
+        const result = await analyticsService.processPageviewEvent(body as AnalyticsPageviewUserInput, headers);
 
         if (result.success) {
           set.status = 204; // No Content - standard for analytics
