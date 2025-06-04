@@ -6,13 +6,6 @@ import env from "../env/server";
 import * as visitorContract from "./contracts/visitor.v0";
 import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
 
-// PostgreSQL state management
-const postgresState = createPostgresPathwayState({
-  connectionString: env.POSTGRES_CONNECTION_STRING || "postgresql://postgres:postgres@localhost:5432/pathway_db",
-  tableName: "_pathway_state", // Following Flowcore convention with underscore prefix
-  ttlMs: 300000, // Optional, defaults to 5 minutes (300000ms)
-});
-
 export const pathways = new PathwaysBuilder({
   baseUrl: env.FLOWCORE_WEBHOOK_BASEURL,
   tenant: env.FLOWCORE_TENANT,
@@ -21,15 +14,19 @@ export const pathways = new PathwaysBuilder({
   logger: noOpLogger,
   pathwayTimeoutMs: 5_000,
 })
-  .register({
-    flowType: visitorContract.FlowcoreAnalytics.flowType,
-    eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-    // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
-    schema: EventVisitorTrackedEventSchema as any,
-    writable: true,
-  })
-  .withPathwayState(postgresState)
-  .handle(
+.withPathwayState(
+  createPostgresPathwayState({
+    connectionString: env.POSTGRES_CONNECTION_STRING || "postgresql://postgres:postgres@localhost:5432/pathway_db",
+  }),
+)
+.register({
+  flowType: visitorContract.FlowcoreAnalytics.flowType,
+  eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
+  // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
+  schema: EventVisitorTrackedEventSchema as any,
+  writable: true,
+})
+.handle(
     `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
     async (event) => {
       console.log("🔄 Processing visitor tracked event:", {
@@ -41,6 +38,7 @@ export const pathways = new PathwaysBuilder({
       });
     }
   );
+  
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");
 
@@ -52,5 +50,4 @@ console.log(`   Flow Type: ${visitorContract.FlowcoreAnalytics.flowType}`);
 console.log(
   `   Event Types: ${Object.values(visitorContract.FlowcoreAnalytics.eventType).join(", ")}`
 );
-console.log(`   Pathway State: ${postgresState ? "Postgres" : "In-Memory"}`);
 console.log(`   Postgres Connection: ${env.POSTGRES_CONNECTION_STRING ? "Using connection string" : "Using fallback connection"}`);
