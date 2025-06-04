@@ -22,22 +22,21 @@ export const pathways = new PathwaysBuilder({
 .register({
   flowType: visitorContract.FlowcoreAnalytics.flowType,
   eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-  // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
-  schema: EventVisitorTrackedEventSchema as any,
+  schema: EventVisitorTrackedEventSchema,
   writable: true,
 })
 .handle(
-    `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
-    async (event) => {
-      console.log("🔄 Processing visitor tracked event:", {
-        eventId: event.eventId,
-        flowType: event.flowType,
-        eventType: event.eventType,
-        validTime: event.validTime,
-        payload: event.payload
-      });
-    }
-  );
+  `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
+  async (event) => {
+    console.log("🔄 Processing visitor tracked event:", {
+      eventId: event.eventId,
+      flowType: event.flowType,
+      eventType: event.eventType,
+      validTime: event.validTime,
+      payload: event.payload
+    });
+  }
+);
   
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");
