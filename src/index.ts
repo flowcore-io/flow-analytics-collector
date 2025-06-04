@@ -3,6 +3,7 @@ import swagger from "@elysiajs/swagger";
 import { Elysia } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
+import { pathwaysRouter } from "./pathways/pathways";
 import { type AnalyticsPageviewUserInput, AnalyticsService } from "./services/analytics";
 
 // Initialize services
@@ -20,6 +21,7 @@ const app = new Elysia()
         "X-Forwarded-For",
         "X-Real-IP",
         "CF-Connecting-IP",
+        "X-Secret", // Add X-Secret for Flowcore transformer authentication
       ],
     })
   )
@@ -40,6 +42,40 @@ const app = new Elysia()
         ],
       },
     })
+  )
+
+  // Flowcore transformer endpoint - handles webhook events from Flowcore
+  .post(
+    "/api/transformer",
+    async ({ body, headers, set }) => {
+      try {
+        // biome-ignore lint/suspicious/noExplicitAny: Flowcore event structure varies by event type
+        const event = body as any;
+        const secret = headers["x-secret"] ?? "";
+        
+        console.log("🔄 Received Flowcore event:", { 
+          eventId: event?.eventId,
+          flowType: event?.flowType,
+          eventType: event?.eventType,
+          secret: secret ? "provided" : "missing"
+        });
+        
+        await pathwaysRouter.processEvent(event, secret);
+        
+        console.log("✅ Successfully processed Flowcore event");
+        set.status = 200;
+        return "OK";
+      } catch (error) {
+        console.error("❌ Error processing Flowcore event:", error);
+        set.status = 500;
+        return { error: (error as Error).message };
+      }
+    },
+    {
+      tags: ["Transformer"],
+      summary: "Flowcore event transformer",
+      description: "Receives and processes events from Flowcore via webhooks",
+    }
   )
 
   // Main analytics event collection endpoint
@@ -132,8 +168,8 @@ const app = new Elysia()
       version: "1.0.0",
       status: "running",
       endpoints: {
-        event: "/api/event",
-        health: "/healthz",
+        pageview: "/api/pageview",
+        health: "/health",
         metrics: "/metrics",
         transformer: "/api/transformer",
         docs: "/swagger",

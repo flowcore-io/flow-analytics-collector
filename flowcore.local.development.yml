@@ -1,0 +1,16 @@
+development:
+  proxyEndpoints:
+    analytics:
+      description: "Analytics transformer for local development"
+      dataCore: flow-analytics
+      flowType: visitor.v0
+      events:
+        - visitor.tracked.v0
+      parameters:
+        - name: PROXY_ENDPOINT
+          type: manual
+          value: "http://localhost:3000/api/transformer"
+        - name: PROXY_HEADER_SECRET
+          type: secret
+          value: analytics-transformer-secret
+    
