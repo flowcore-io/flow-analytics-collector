@@ -1,23 +1,12 @@
 # Flowcore Analytics Collector
 
-A privacy-first analytics collection API built with Elysia.js that emits events to Flowcore. This service accepts lightweight page-view and custom-event payloads from browsers, computes daily salted hashes of IP + User-Agent for privacy-safe visitor identification, and emits each hit to Flowcore's immutable event log.
+A privacy-first analytics collection API built with Elysia.js that emits events to Flowcore.
 
 ## Features
 
 🔒 **Privacy-First**: No raw IPs or personal identifiers stored - only daily rotating hashes
-🚀 **Lightweight**: Minimal overhead with fast response times (p50 ≤ 50ms)
 🛡️ **GDPR Compliant**: No cookies, no persistent tracking, automatic data anonymization
 ⚡ **Real-time**: Events flow to Flowcore for immediate analytics processing
-📊 **Scalable**: Stateless design with horizontal scaling support
-🔍 **Observable**: Health checks, metrics, and structured logging
-
-## Architecture
-
-- **Data Core**: `flow-analytics`
-- **Flow Type**: `visitor.v0`
-- **Event Type**: `visitor.tracked.v0`
-
-The collector processes analytics events through Flowcore Pathways, ensuring reliable delivery and event ordering.
 
 ## Quick Start
 
@@ -34,13 +23,6 @@ Copy the example environment file and configure your settings:
 ```bash
 cp env.example .env
 ```
-
-Required environment variables:
-- `SECRET_KEY`: 32+ character secret for salt generation
-- `FLOWCORE_TENANT`: Your Flowcore tenant name
-- `FLOWCORE_WEBHOOK_BASEURL`: Flowcore webhook URL
-- `FLOWCORE_WEBHOOK_API_KEY`: Flowcore API key
-- `FLOWCORE_TRANSFORMER_SECRET`: Secret for transformer authentication
 
 ### 3. Set Up Flowcore Resources
 
