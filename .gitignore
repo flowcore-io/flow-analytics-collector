@@ -128,3 +128,6 @@ jspm_packages/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+flowcore.local.yml
+flowcore.yml
