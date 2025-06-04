@@ -11,9 +11,9 @@
     "format:fix": "biome format --write src/",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
-    "flowcore:apply": "flowcore apply -f flowcore.yml",
-    "flowcore:stream": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
-    "flowcore:backfill": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
+    "flowcore:apply": "flowcore apply -f flowcore.yaml",
+    "flowcore:stream": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
+    "flowcore:backfill": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
