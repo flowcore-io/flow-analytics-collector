@@ -58,6 +58,7 @@ build/
 .vscode/launch.json
 .vscode/tasks.json
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
