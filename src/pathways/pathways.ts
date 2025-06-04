@@ -16,7 +16,7 @@ export const pathways = new PathwaysBuilder({
 })
 .withPathwayState(
   createPostgresPathwayState({
-    connectionString: env.POSTGRES_CONNECTION_STRING || "postgresql://postgres:postgres@localhost:5432/pathway_db",
+    connectionString: env.POSTGRES_CONNECTION_STRING,
   }),
 )
 .register({

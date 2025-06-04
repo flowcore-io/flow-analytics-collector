@@ -16,7 +16,7 @@ const envSchema = z.object({
   REDIS_URL: z.string().optional(),
 
   // Database (for pathway state)
-  POSTGRES_CONNECTION_STRING: z.string().optional(),
+  POSTGRES_CONNECTION_STRING: z.string(),
 });
 
 export type Env = z.infer<typeof envSchema>;
