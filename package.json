@@ -11,8 +11,7 @@
     "format:fix": "biome format --write src/",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
-    "flowcore:apply:production": "flowcore apply -f flowcore.yml",
-    "flowcore:apply:dev": "flowcore data-core apply -f flowcore.yml -f flowcore.local.yml",
+    "flowcore:apply": "flowcore apply -f flowcore.yml",
     "flowcore:stream": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\"",
     "flowcore:backfill": "flowcore scenario local -f flowcore.yml -f flowcore.local.yml -f flowcore.local.development.yml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: analytics-transformer-secret\""
   },
