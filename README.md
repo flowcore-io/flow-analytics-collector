@@ -14,6 +14,7 @@ anonymization
 ## Prerequisites
 
 - [Flowcore CLI](https://docs.flowcore.io/guides/flowcore-cli/install-cli/)
+- [Flowcore Platform account](https://flowcore.io)
 
 ## Quick Start
 
@@ -62,6 +63,11 @@ bun flowcore:stream
 ```
 
 this will start a local event listener that will poll for events from the Flowcore Platform based on the yaml manifest files.
+
+### 7. run the test.html file and click the manual send button
+
+this will send an event to the Flowcore Platform you can then go to your tenant on Flowcore Platform and see the event in the Data Core.
+
 
 
 ## API Endpoints
