@@ -4,9 +4,12 @@ A privacy-first analytics collection API built with Elysia.js that emits events 
 
 ## Features
 
-🔒 **Privacy-First**: No raw IPs or personal identifiers stored - only daily rotating hashes
-🛡️ **GDPR Compliant**: No cookies, no persistent tracking, automatic data anonymization
-⚡ **Real-time**: Events flow to Flowcore for immediate analytics processing
+**Privacy-First**: No raw IPs or personal identifiers stored - only daily rotating hashes
+
+**GDPR Compliant**: No cookies, no persistent tracking, automatic data 
+anonymization
+
+**Real-time**: Events flow to Flowcore for immediate analytics processing
 
 ## Quick Start
 
