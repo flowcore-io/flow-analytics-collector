@@ -6,29 +6,12 @@ import env from "../env/server";
 import * as visitorContract from "./contracts/visitor.v0";
 import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
 
-// Create pathway state (in-memory for now)
-const pathwayState = undefined;
-
+// PostgreSQL state management
 const postgresState = createPostgresPathwayState({
-  host: "localhost",
-  port: 5432,
-  user: "postgres",
-  password: "postgres",
-  database: "pathway_db",
-  tableName: "pathway_state", // Optional, defaults to "pathway_state"
+  connectionString: env.POSTGRES_CONNECTION_STRING || "postgresql://postgres:postgres@localhost:5432/pathway_db",
+  tableName: "_pathway_state", // Following Flowcore convention with underscore prefix
   ttlMs: 300000, // Optional, defaults to 5 minutes (300000ms)
-  ssl: false, // Optional, defaults to false
-})
-
-// If Postgres is available, use it for pathway state persistence
-if (env.POSTGRES_CONNECTION_STRING) {
-  try {
-    // Note: Postgres pathway state requires additional configuration
-    console.log("📊 Postgres URL available for pathway state");
-  } catch (_error) {
-    console.warn("⚠️ Postgres pathway state not available, using in-memory state");
-  }
-}
+});
 
 export const pathways = new PathwaysBuilder({
   baseUrl: env.FLOWCORE_WEBHOOK_BASEURL,
@@ -45,10 +28,17 @@ export const pathways = new PathwaysBuilder({
     schema: EventVisitorTrackedEventSchema as any,
     writable: true,
   })
+  .withPathwayState(postgresState)
   .handle(
     `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
     async (event) => {
-      console.log("herro", event);
+      console.log("🔄 Processing visitor tracked event:", {
+        eventId: event.eventId,
+        flowType: event.flowType,
+        eventType: event.eventType,
+        validTime: event.validTime,
+        payload: event.payload
+      });
     }
   );
 
@@ -62,4 +52,5 @@ console.log(`   Flow Type: ${visitorContract.FlowcoreAnalytics.flowType}`);
 console.log(
   `   Event Types: ${Object.values(visitorContract.FlowcoreAnalytics.eventType).join(", ")}`
 );
-console.log(`   Pathway State: ${pathwayState ? "Postgres" : "In-Memory"}`);
+console.log(`   Pathway State: ${postgresState ? "Postgres" : "In-Memory"}`);
+console.log(`   Postgres Connection: ${env.POSTGRES_CONNECTION_STRING ? "Using connection string" : "Using fallback connection"}`);
