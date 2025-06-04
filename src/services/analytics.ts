@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { extractClientIP, generateVisitorHash } from "../lib/privacy";
-import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathways";
+import { FlowcoreAnalytics, pathways } from "../pathways";
 
 // Input validation schema for incoming analytics events
 export const AnalyticsPageviewInputSchema = z.strictObject({
@@ -11,7 +11,7 @@ export const AnalyticsPageviewInputSchema = z.strictObject({
 export type AnalyticsPageviewUserInput = z.infer<typeof AnalyticsPageviewInputSchema>;
 
 /**
- * Analytics service for processing and emitting visitor tracking events
+ * Analytics service for processing website analytics events
  */
 export class AnalyticsService {
   /**
@@ -24,7 +24,6 @@ export class AnalyticsService {
   ): Promise<{ success: true; eventId?: string } | { success: false; error: string }> {
     console.log("🔍 Processing pageview:", input);
     try {
-      // Validate input
       const validatedInput = AnalyticsPageviewInputSchema.parse(input);
 
       // Extract privacy information
@@ -34,22 +33,19 @@ export class AnalyticsService {
       // Generate privacy-safe visitor hash
       const visitorHash = generateVisitorHash(clientIP, userAgent);
 
-      // Create the event
-      const event = createVisitorTrackedEvent({
-        visitorHash,
-        pathname: validatedInput.pathname,
-        referrer: validatedInput.referrer,
-        sessionContext: {
-          dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
-        },
-      });
-
       // Write to Flowcore via pathways
       // This will trigger the handler after successful emission
       await pathways.write(
         `${FlowcoreAnalytics.flowType}/${FlowcoreAnalytics.eventType.visitorTracked}`,
         {
-          data: event,
+          data: {
+            visitorHash,
+            pathname: validatedInput.pathname,
+            referrer: validatedInput.referrer,
+            sessionContext: {
+              dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+            },
+          },
         }
       );
 

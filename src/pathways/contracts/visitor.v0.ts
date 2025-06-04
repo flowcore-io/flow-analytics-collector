@@ -18,28 +18,10 @@ export const EventVisitorTrackedEventSchema = z.strictObject({
   referrer: z.string(), // The page that linked to the current page
 
   // Session context (derived from hash, not personally identifiable)
-  sessionContext: z
-    .object({
-      dailySaltRotation: z.string(), // Date of current salt for debugging
-    })
+  sessionContext: z.object({
+    dailySaltRotation: z.string(), // Date of current salt for debugging
+  }),
 });
 
 // Type exports
 export type EventVisitorTracked = z.infer<typeof EventVisitorTrackedEventSchema>;
-
-// Helper function to create a visitor tracked event
-export function createVisitorTrackedEvent(data: {
-  visitorHash: string;
-  pathname: string;
-  referrer: string;
-  sessionContext: {
-    dailySaltRotation: string;
-  };
-}): EventVisitorTracked {
-  return {
-    visitorHash: data.visitorHash,
-    pathname: data.pathname,
-    referrer: data.referrer,
-    sessionContext: data.sessionContext,
-  };
-}
