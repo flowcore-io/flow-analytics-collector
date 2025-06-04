@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 import { extractClientIP, generateVisitorHash } from "../lib/privacy";
 import { FlowcoreAnalytics, createVisitorTrackedEvent, pathways } from "../pathways";
 
