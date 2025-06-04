@@ -3,8 +3,6 @@ import swagger from "@elysiajs/swagger";
 import type { FlowcoreLegacyEvent } from "@flowcore/pathways";
 import { Elysia } from "elysia";
 import env from "./env/server";
-import { getSaltRotationInfo } from "./lib/privacy";
-import { FlowcoreAnalytics } from "./pathways/contracts/visitor.v0";
 import { pathwaysRouter } from "./pathways/pathways";
 import { type AnalyticsPageviewUserInput, AnalyticsService } from "./services/analytics";
 
@@ -28,7 +26,6 @@ const app = new Elysia()
     })
   )
 
-  // Add Swagger documentation
   .use(
     swagger({
       documentation: {
@@ -54,16 +51,7 @@ const app = new Elysia()
         const event = body as unknown as FlowcoreLegacyEvent;
         const secret = headers["x-secret"] ?? "";
 
-        console.log("🔄 Received Flowcore event:", {
-          eventId: event?.eventId,
-          flowType: event?.flowType,
-          eventType: event?.eventType,
-          secret: secret ? "provided" : "missing",
-        });
-
         await pathwaysRouter.processEvent(event, secret);
-
-        console.log("✅ Successfully processed Flowcore event");
         set.status = 200;
         return "OK";
       } catch (error) {
@@ -106,33 +94,6 @@ const app = new Elysia()
       summary: "Track page view or custom event",
       description:
         "Accepts analytics events, generates privacy-safe visitor hash, and emits to Flowcore",
-    }
-  )
-
-  // Detailed health endpoint with analytics info
-  .get(
-    "/health",
-    () => {
-      const healthStatus = analyticsService.getHealthStatus();
-      const saltInfo = getSaltRotationInfo();
-
-      return {
-        ...healthStatus,
-        saltRotation: {
-          nextRotationAt: saltInfo.nextRotationAt,
-          secondsUntilRotation: saltInfo.secondsUntilRotation,
-        },
-        environment: {
-          tenant: env.FLOWCORE_TENANT,
-          dataCore: FlowcoreAnalytics.dataCore,
-        },
-      };
-    },
-    {
-      tags: ["Health"],
-      summary: "Detailed health information",
-      description:
-        "Returns detailed service health including salt rotation and Flowcore configuration",
     }
   )
 

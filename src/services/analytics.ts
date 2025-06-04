@@ -35,6 +35,15 @@ export class AnalyticsService {
 
       // Write to Flowcore via pathways
       // This will trigger the handler after successful emission
+      console.log("🔄 Writing visitor-tracked event to Flowcore:", {
+        visitorHash,
+        pathname: validatedInput.pathname,
+        referrer: validatedInput.referrer,
+        sessionContext: {
+          dailySaltRotation: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+        },
+      });
+
       await pathways.write(
         `${FlowcoreAnalytics.flowType}/${FlowcoreAnalytics.eventType.visitorTracked}`,
         {
@@ -48,8 +57,6 @@ export class AnalyticsService {
           },
         }
       );
-
-      console.log(`📊 Analytics event processed: ${validatedInput.pathname}`);
 
       return { success: true };
     } catch (error) {
@@ -67,18 +74,5 @@ export class AnalyticsService {
         error: error instanceof Error ? error.message : "Unknown error",
       };
     }
-  }
-
-  /**
-   * Get analytics service health status
-   */
-  getHealthStatus() {
-    return {
-      status: "ok",
-      service: "analytics",
-      pathwaysConfigured: true,
-      flowType: FlowcoreAnalytics.flowType,
-      eventTypes: Object.values(FlowcoreAnalytics.eventType),
-    };
   }
 }

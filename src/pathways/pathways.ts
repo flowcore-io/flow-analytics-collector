@@ -22,10 +22,11 @@ export const pathways = new PathwaysBuilder({
     schema: EventVisitorTrackedEventSchema,
     writable: true,
   })
-  .handle(
+  
+  await pathways.handle(
     `${FlowcoreAnalytics.flowType}/${FlowcoreAnalytics.eventType.visitorTracked}`,
     async (event) => {
-      console.log("🔄 Processing visitor tracked event:", {
+      console.log("🔄 Received visitor-tracked event from Flowcore:", {
         eventId: event.eventId,
         flowType: event.flowType,
         eventType: event.eventType,
