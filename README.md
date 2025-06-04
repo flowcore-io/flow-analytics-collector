@@ -11,6 +11,10 @@ anonymization
 
 **Real-time**: Events flow to Flowcore for immediate analytics processing
 
+## Prerequisites
+
+- [Flowcore CLI](https://docs.flowcore.io/guides/flowcore-cli/install-cli/)
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -29,79 +33,49 @@ cp env.example .env
 
 ### 3. Set Up Flowcore Resources
 
-Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant information, then create the data core:
+Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant name
 
 ```bash
-bun run flowcore:apply:dev
+bun flowcore:apply
 ```
 
-### 4. Start Development Server
+### 4. run the docker compose file
 
 ```bash
-bun run dev
+docker compose up -d
 ```
+the docker compose file will create a postgres database.
+the table will be created automatically when the first event is sent.
 
-The server will start at `http://localhost:3000` with:
-- API docs at `/swagger`
-- Health check at `/healthz`
-- Metrics at `/metrics`
-- Analytics endpoint at `/api/event`
+### 5. Start Development Server
+
+```bash
+bun dev
+```
 
 ## API Endpoints
 
-### POST /api/event
+### POST /api/pageview
 
 Track page views and custom events:
 
 ```typescript
 interface AnalyticsEvent {
-  pathname: string;           // Required: Page pathname
-  referrer?: string;          // Optional: Referrer URL
-  eventName?: string;         // Optional: Custom event name
-  customProperties?: Record<string, unknown>; // Optional: Event metadata
+  pathname: string;           // Required: Page pathname. The pathname of the page the user is on.
+  referrer: string;          // Required: Referrer URL. which page referred the user to this page.
 }
 ```
 
 **Example:**
 
 ```bash
-curl -X POST http://localhost:3000/api/event \
+curl -X POST http://localhost:3000/api/pageview \
   -H "Content-Type: application/json" \
   -d '{
     "pathname": "/home",
     "referrer": "https://google.com",
-    "eventName": "page_view"
   }'
 ```
-
-### GET /healthz
-
-Simple health check for load balancers:
-
-```json
-{ "status": "ok" }
-```
-
-### GET /health
-
-Detailed health information including salt rotation status:
-
-```json
-{
-  "status": "ok",
-  "service": "analytics",
-  "pathwaysConfigured": true,
-  "flowType": "visitor.v0",
-  "saltRotation": {
-    "nextRotationAt": "2024-01-02T00:00:00.000Z",
-    "secondsUntilRotation": 43200
-  }
-}
-```
-
-### GET /metrics
-
-Prometheus-compatible metrics for monitoring.
 
 ## Privacy Implementation
 
