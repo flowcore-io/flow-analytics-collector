@@ -1,10 +1,7 @@
 import { noOpLogger } from "@flowcore/data-pump";
 import { PathwayRouter, PathwaysBuilder, createPostgresPathwayState } from "@flowcore/pathways";
 import env from "../env/server";
-
-// Import contracts and handlers
-import * as visitorContract from "./contracts/visitor.v0";
-import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
+import { EventVisitorTrackedEventSchema, FlowcoreAnalytics } from "./contracts/visitor.v0";
 
 export const pathways = new PathwaysBuilder({
   baseUrl: env.FLOWCORE_WEBHOOK_BASEURL,
@@ -20,13 +17,13 @@ export const pathways = new PathwaysBuilder({
   }),
 )
 .register({
-  flowType: visitorContract.FlowcoreAnalytics.flowType,
-  eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
+  flowType: FlowcoreAnalytics.flowType,
+  eventType: FlowcoreAnalytics.eventType.visitorTracked,
   schema: EventVisitorTrackedEventSchema,
   writable: true,
 })
 .handle(
-  `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
+  `${FlowcoreAnalytics.flowType}/${FlowcoreAnalytics.eventType.visitorTracked}`,
   async (event) => {
     console.log("🔄 Processing visitor tracked event:", {
       eventId: event.eventId,
@@ -40,13 +37,3 @@ export const pathways = new PathwaysBuilder({
   
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");
-
-// Log the pathways configuration
-console.log("🛤️ Flowcore Pathways configured:");
-console.log(`   Tenant: ${env.FLOWCORE_TENANT}`);
-console.log(`   Data Core: ${env.FLOWCORE_DATACORE}`);
-console.log(`   Flow Type: ${visitorContract.FlowcoreAnalytics.flowType}`);
-console.log(
-  `   Event Types: ${Object.values(visitorContract.FlowcoreAnalytics.eventType).join(", ")}`
-);
-console.log(`   Postgres Connection: ${env.POSTGRES_CONNECTION_STRING ? "Using connection string" : "Using fallback connection"}`);
