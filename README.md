@@ -33,18 +33,20 @@ cp env.example .env
 
 ### 3. Set Up Flowcore Resources
 
-Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant name
+Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant name.
 
 ```bash
 bun flowcore:apply
 ```
+when you call this command you create data core/s and scenarios on the Flowcore Platform.
 
 ### 4. run the docker compose file
 
 ```bash
 docker compose up -d
 ```
-the docker compose file will create a postgres database.
+the docker compose file will create a postgres database container.
+Postgres is used to store the Flowcore Pathway state.
 the table will be created automatically when the first event is sent.
 
 ### 5. Start Development Server
@@ -59,14 +61,14 @@ bun dev
 bun flowcore:stream
 ```
 
-this will start a local event listener that will poll for events from the Flowcore Platform. 
+this will start a local event listener that will poll for events from the Flowcore Platform based on the yaml manifest files.
 
 
 ## API Endpoints
 
 ### POST /api/pageview
 
-Track page views and custom events:
+Track page views:
 
 ```typescript
 interface AnalyticsEvent {
