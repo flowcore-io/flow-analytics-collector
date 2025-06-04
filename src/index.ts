@@ -1,8 +1,10 @@
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
+import type { FlowcoreLegacyEvent } from "@flowcore/pathways";
 import { Elysia } from "elysia";
 import env from "./env/server";
 import { getSaltRotationInfo } from "./lib/privacy";
+import { FlowcoreAnalytics } from "./pathways/contracts/visitor.v0";
 import { pathwaysRouter } from "./pathways/pathways";
 import { type AnalyticsPageviewUserInput, AnalyticsService } from "./services/analytics";
 
@@ -49,19 +51,18 @@ const app = new Elysia()
     "/api/transformer",
     async ({ body, headers, set }) => {
       try {
-        // biome-ignore lint/suspicious/noExplicitAny: Flowcore event structure varies by event type
-        const event = body as any;
+        const event = body as unknown as FlowcoreLegacyEvent;
         const secret = headers["x-secret"] ?? "";
-        
-        console.log("🔄 Received Flowcore event:", { 
+
+        console.log("🔄 Received Flowcore event:", {
           eventId: event?.eventId,
           flowType: event?.flowType,
           eventType: event?.eventType,
-          secret: secret ? "provided" : "missing"
+          secret: secret ? "provided" : "missing",
         });
-        
+
         await pathwaysRouter.processEvent(event, secret);
-        
+
         console.log("✅ Successfully processed Flowcore event");
         set.status = 200;
         return "OK";
@@ -83,7 +84,10 @@ const app = new Elysia()
     "/api/pageview",
     async ({ body, headers, set }) => {
       try {
-        const result = await analyticsService.processPageview(body as AnalyticsPageviewUserInput, headers);
+        const result = await analyticsService.processPageview(
+          body as AnalyticsPageviewUserInput,
+          headers
+        );
 
         if (result.success) {
           set.status = 204; // No Content - standard for analytics
@@ -120,7 +124,7 @@ const app = new Elysia()
         },
         environment: {
           tenant: env.FLOWCORE_TENANT,
-          dataCore: env.FLOWCORE_DATACORE,
+          dataCore: FlowcoreAnalytics.dataCore,
         },
       };
     },
@@ -132,34 +136,6 @@ const app = new Elysia()
     }
   )
 
-  // Metrics endpoint for monitoring
-  .get(
-    "/metrics",
-    () => {
-      const saltInfo = getSaltRotationInfo();
-
-      // Basic metrics in a format that could be consumed by Prometheus
-      const metrics = [
-        "# HELP analytics_salt_rotation_seconds Seconds until next salt rotation",
-        "# TYPE analytics_salt_rotation_seconds gauge",
-        `analytics_salt_rotation_seconds ${saltInfo.secondsUntilRotation}`,
-        "",
-        "# HELP analytics_service_info Service information",
-        "# TYPE analytics_service_info gauge",
-        `analytics_service_info{tenant="${env.FLOWCORE_TENANT}",datacore="${env.FLOWCORE_DATACORE}",flow_type="visitor.v0"} 1`,
-      ].join("\n");
-
-      return new Response(metrics, {
-        headers: { "Content-Type": "text/plain" },
-      });
-    },
-    {
-      tags: ["Health"],
-      summary: "Prometheus metrics",
-      description: "Returns metrics in Prometheus format for monitoring systems",
-    }
-  )
-
   // Root endpoint
   .get(
     "/",
@@ -168,11 +144,10 @@ const app = new Elysia()
       version: "1.0.0",
       status: "running",
       endpoints: {
-        pageview: "/api/pageview",
         health: "/health",
-        metrics: "/metrics",
-        transformer: "/api/transformer",
         docs: "/swagger",
+        transformer: "/api/transformer",
+        pageview: "/api/pageview",
       },
     }),
     {

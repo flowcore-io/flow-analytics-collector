@@ -6,7 +6,7 @@ import { EventVisitorTrackedEventSchema, FlowcoreAnalytics } from "./contracts/v
 export const pathways = new PathwaysBuilder({
   baseUrl: env.FLOWCORE_WEBHOOK_BASEURL,
   tenant: env.FLOWCORE_TENANT,
-  dataCore: env.FLOWCORE_DATACORE,
+  dataCore: FlowcoreAnalytics.dataCore,
   apiKey: env.FLOWCORE_API_KEY,
   logger: noOpLogger,
   pathwayTimeoutMs: 5_000,

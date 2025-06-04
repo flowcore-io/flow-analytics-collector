@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const FlowcoreAnalytics = {
+  dataCore: "flow-analytics",
   flowType: "visitor.v0",
   eventType: {
     visitorTracked: "visitor.tracked.v0",
@@ -19,7 +20,7 @@ export const EventVisitorTrackedEventSchema = z.strictObject({
   // Session context (derived from hash, not personally identifiable)
   sessionContext: z
     .object({
-      dailySaltRotation: z.string().min(1, "Daily salt rotation is required"), // Date of current salt for debugging
+      dailySaltRotation: z.string(), // Date of current salt for debugging
     })
 });
 
