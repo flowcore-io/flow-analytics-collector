@@ -1,5 +1,5 @@
 import { noOpLogger } from "@flowcore/data-pump";
-import { PathwayRouter, PathwaysBuilder } from "@flowcore/pathways";
+import { PathwayRouter, PathwaysBuilder, createPostgresPathwayState } from "@flowcore/pathways";
 import env from "../env/server";
 
 // Import contracts and handlers
@@ -8,6 +8,17 @@ import { EventVisitorTrackedEventSchema } from "./contracts/visitor.v0";
 
 // Create pathway state (in-memory for now)
 const pathwayState = undefined;
+
+const postgresState = createPostgresPathwayState({
+  host: "localhost",
+  port: 5432,
+  user: "postgres",
+  password: "postgres",
+  database: "pathway_db",
+  tableName: "pathway_state", // Optional, defaults to "pathway_state"
+  ttlMs: 300000, // Optional, defaults to 5 minutes (300000ms)
+  ssl: false, // Optional, defaults to false
+})
 
 // If Postgres is available, use it for pathway state persistence
 if (env.POSTGRES_CONNECTION_STRING) {
@@ -25,23 +36,21 @@ export const pathways = new PathwaysBuilder({
   dataCore: env.FLOWCORE_DATACORE,
   apiKey: env.FLOWCORE_API_KEY,
   logger: noOpLogger,
-  pathwayTimeoutMs: 30_000,
-}).register({
-  flowType: visitorContract.FlowcoreAnalytics.flowType,
-  eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
-  // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
-  schema: EventVisitorTrackedEventSchema as any,
-  writable: true,
-});
-// .handle(
-//   `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
-//   // Type assertion needed for handler compatibility
-//   handlerVisitorTracked as (event: {
-//     eventId: string;
-//     validTime: string;
-//     payload: unknown;
-//   }) => Promise<void>
-// );
+  pathwayTimeoutMs: 5_000,
+})
+  .register({
+    flowType: visitorContract.FlowcoreAnalytics.flowType,
+    eventType: visitorContract.FlowcoreAnalytics.eventType.visitorTracked,
+    // biome-ignore lint/suspicious/noExplicitAny: Flowcore library compatibility requires any type
+    schema: EventVisitorTrackedEventSchema as any,
+    writable: true,
+  })
+  .handle(
+    `${visitorContract.FlowcoreAnalytics.flowType}/${visitorContract.FlowcoreAnalytics.eventType.visitorTracked}`,
+    async (event) => {
+      console.log("herro", event);
+    }
+  );
 
 export const pathwaysRouter = new PathwayRouter(pathways, env.FLOWCORE_TRANSFORMER_SECRET || "_");
 
