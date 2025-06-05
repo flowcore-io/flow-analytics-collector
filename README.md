@@ -37,18 +37,19 @@ cp env.example .env
 Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant name.
 
 ```bash
-bun flowcore:apply
+bun flowcore:apply:data-core
 ```
-when you call this command you create data core/s and scenarios on the Flowcore Platform.
+when you call this command you create a Data Core on the Flowcore Platform.
 
-### 4. run the docker compose file
+### 4. Run the docker compose file
 
 ```bash
 docker compose up -d
 ```
 the docker compose file will create a postgres database container.
 Postgres is used to store the Flowcore Pathway state.
-the table will be created automatically when the first event is sent.
+Flowcore Pathways is a Flowcore library used in this project.
+The db table will be created automatically when the first event is sent.
 
 ### 5. Start Development Server
 
@@ -56,18 +57,19 @@ the table will be created automatically when the first event is sent.
 bun dev
 ```
 
-### 6. run local stream command for development testing
+### 6. Run command to start the local proxy
+
+ This command will listen for events coming from the Flowcore Platform and route them to a POST endpoint in this project.
+ The POST endpoint uses the Flowcore Pathways library to proxy events to Pathway handlers defined in the project.
+ This command is used for local development and to make a local event listener.
 
 ```bash
-bun flowcore:stream
+bun flowcore:local:proxy
 ```
 
-this will start a local event listener that will poll for events from the Flowcore Platform based on the yaml manifest files.
+### 7. Run the test.html file and click the manual send button
 
-### 7. run the test.html file and click the manual send button
-
-this will send an event to the Flowcore Platform you can then go to your tenant on Flowcore Platform and see the event in the Data Core.
-
+This will send an event to the Flowcore Platform where it is stored and then it gets fanned out to the local proxy endpoint.
 
 
 ## API Endpoints
