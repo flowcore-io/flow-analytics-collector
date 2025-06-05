@@ -12,10 +12,10 @@
     "format:fix": "biome format --write src/",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
-    "flowcore:apply:data-core": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
-    "flowcore:apply:proxy": "flowcore scenario apply -f flowcore.yaml",
-    "flowcore:local:proxy": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\"",
-    "flowcore:local:proxy:backfill": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\""
+    "flowcore:apply:data-core": "dotenv -- flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
+    "flowcore:apply:proxy": "dotenv -- flowcore scenario apply -f flowcore.yaml",
+    "flowcore:local:proxy": "dotenv -- flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\"",
+    "flowcore:local:proxy:backfill": "dotenv -- flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\""
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
@@ -30,7 +30,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "bun-types": "latest"
+    "bun-types": "latest",
+    "dotenv-cli": "^8.0.0"
   },
   "module": "src/index.js"
 }
