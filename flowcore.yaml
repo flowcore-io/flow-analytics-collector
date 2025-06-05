@@ -23,12 +23,5 @@ scenario:
       flowType: visitor.v0
       events:
         - visitor.tracked.v0
-      parameters:
-        - name: PROXY_ENDPOINT
-          type: manual
-          value: "http://localhost:3000/api/transformer"
-        - name: PROXY_HEADER_SECRET
-          type: secret
-          value: analytics-transformer-secret
       blueprint:
         artifactUrl: "https://flowcore-public-runtimes.s3.eu-west-1.amazonaws.com/transformer-proxy-1.4.1.zip" 
