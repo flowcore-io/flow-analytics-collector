@@ -8,10 +8,3 @@ development:
         - visitor.tracked.v0
       endpoints:
         - ""
-      parameters:
-        - name: PROXY_ENDPOINT
-          type: manual
-        - name: PROXY_HEADER_SECRET
-          type: secret
-          value: analytics-transformer-secret
-    
