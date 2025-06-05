@@ -12,7 +12,7 @@
     "format:fix": "biome format --write src/",
     "check": "biome check src/",
     "check:fix": "biome check --write src/",
-    "flowcore:apply": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
+    "flowcore:apply:prod:data-core": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
     "flowcore:apply:prod:proxy": "flowcore scenario apply -f flowcore.yaml",
     "flowcore:local:proxy": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\"",
     "flowcore:local:proxy:backfill": "flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\""
