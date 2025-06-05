@@ -23,5 +23,6 @@ scenario:
       flowType: visitor.v0
       events:
         - visitor.tracked.v0
+      parameters: []
       blueprint:
         artifactUrl: "https://flowcore-public-runtimes.s3.eu-west-1.amazonaws.com/transformer-proxy-1.4.1.zip" 
