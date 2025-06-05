@@ -11,3 +11,19 @@ dataCore:
       eventTypes:
         visitor.tracked.v0:
           description: "Privacy-safe visitor tracking event with daily rotating hash"
+scenario:
+  name: example-scenario
+  description: "An example scenario"
+  transformers:
+    example-transformer:
+      description: "An example transformer"
+      dataCore: example-data-core
+      flowType: example
+      events:
+        - example.event.0
+      parameters:
+        - name: PROXY_ENDPOINT
+          type: manual
+          value: "https://example.com"
+      blueprint:
+        artifactUrl: "https://flowcore-public-runtimes.s3.eu-west-1.amazonaws.com/transformer-proxy-1.1.0.zip"
