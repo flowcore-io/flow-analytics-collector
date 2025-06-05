@@ -11,18 +11,3 @@ dataCore:
       eventTypes:
         visitor.tracked.v0:
           description: "Privacy-safe visitor tracking event with daily rotating hash"
-
-scenario:
-  name: "flow-analytics-collector"
-  description: "Analytics collection scenario for privacy-first visitor tracking"
-  
-  transformers:
-    analytics:
-      description: "Analytics event transformer"
-      dataCore: flow-analytics
-      flowType: visitor.v0
-      events:
-        - visitor.tracked.v0
-      parameters: []
-      blueprint:
-        artifactUrl: "https://flowcore-public-runtimes.s3.eu-west-1.amazonaws.com/transformer-proxy-1.4.1.zip" 
