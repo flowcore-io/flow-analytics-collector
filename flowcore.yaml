@@ -1,5 +1,5 @@
 version: 1
-tenant: rodriguez-llc  # Replace with your actual tenant name
+tenant: your-tenant-name  # Replace with your actual tenant name
 dataCore:
   name: flow-analytics
   deleteProtection: true

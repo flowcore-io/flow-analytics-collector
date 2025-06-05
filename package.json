@@ -14,8 +14,8 @@
     "check:fix": "biome check --write src/",
     "flowcore:apply:data-core": "env-cmd flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
     "flowcore:apply:proxy": "env-cmd flowcore scenario apply -f flowcore.yaml",
-    "flowcore:local:proxy": "env-cmd -x flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transform -H \"X-Secret: \\$FLOWCORE_TRANSFORMER_SECRET\"",
-    "flowcore:local:proxy:backfill": "env-cmd flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -z 5 -e http://localhost:3000/api/transformer -H 'X-Secret: $FLOWCORE_TRANSFORMER_SECRET'"
+    "flowcore:local:proxy": "./scripts/flowcore-proxy.sh",
+    "flowcore:local:proxy:backfill": "./scripts/flowcore-proxy-backfill.sh"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",
@@ -31,6 +31,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "bun-types": "latest",
+    "cross-env": "^7.0.3",
     "dotenv-cli": "^8.0.0",
     "env-cmd": "^10.1.0"
   },
