@@ -80,7 +80,7 @@
         <div>
             <strong>Current Page:</strong> <code id="current-path"></code><br>
             <strong>Referrer:</strong> <code id="current-referrer"></code><br>
-            <strong>API Endpoint:</strong> <code>http://localhost:3000/api/pageview</code><br>
+            <strong>API Endpoint:</strong> <code>http://localhost:3005/api/pageview</code><br>
             <strong>Auto-tracking:</strong> <code>✅ Enabled</code>
         </div>
     </div>
@@ -157,7 +157,7 @@
         // Tracks only page navigation with pathname and referrer
         (() => {
             const config = {
-                endpoint: "http://localhost:3000/api/pageview",
+                endpoint: "http://localhost:3005/api/pageview",
                 domain: window.location.hostname,
                 debug: true
             };
@@ -270,7 +270,7 @@
         })();
 
         // Additional test functions for the UI
-        const HEALTH_API = 'http://localhost:3000/health';
+        const HEALTH_API = 'http://localhost:3005/health';
 
         // Update page info
         document.getElementById('current-path').textContent = window.location.pathname;

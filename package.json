@@ -14,7 +14,7 @@
     "check:fix": "biome check --write src/",
     "flowcore:apply:data-core": "flowcore data-core apply -f flowcore.yaml -f flowcore.local.yaml",
     "flowcore:apply:proxy": "flowcore scenario apply -f flowcore.yaml",
-    "flowcore:local:proxy": "env-cmd -f .env -- sh -c 'flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3000/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\"'"
+    "flowcore:local:proxy": "env-cmd -f .env -- sh -c 'flowcore scenario local -f flowcore.yaml -f flowcore.local.yaml -f flowcore.local.development.yaml -s now -e http://localhost:3005/api/transformer -H \"X-Secret: $FLOWCORE_TRANSFORMER_SECRET\"'"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.3.3",

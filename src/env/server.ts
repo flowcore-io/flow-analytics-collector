@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  PORT: z.string().default("3000"),
+  PORT: z.string().default("3005"),
   SECRET_KEY: z.string().min(32, "SECRET_KEY must be at least 32 characters"), // key for salting visitor hash
 
   // Flowcore Configuration
@@ -15,7 +15,7 @@ const envSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 
 const env = envSchema.parse({
-  PORT: process.env.PORT || "3000",
+  PORT: process.env.PORT || "3005",
   SECRET_KEY: process.env.SECRET_KEY,
   FLOWCORE_TENANT: process.env.FLOWCORE_TENANT,
   FLOWCORE_WEBHOOK_BASEURL: process.env.FLOWCORE_WEBHOOK_BASEURL,

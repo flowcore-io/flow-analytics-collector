@@ -88,7 +88,7 @@ interface AnalyticsEvent {
 **Example:**
 
 ```bash
-curl -X POST http://localhost:3000/api/pageview \
+curl -X POST http://localhost:3005/api/pageview \
   -H "Content-Type: application/json" \
   -d '{
     "pathname": "/home",
