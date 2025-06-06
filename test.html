@@ -87,9 +87,8 @@
 
     <div class="container">
         <h3>Manual Tracking</h3>
-        <button onclick="window.trackPageview()">Track Current Page</button>
+        <button onclick="window.trackPageview(window.location.pathname, document.referrer)">Track Current Page</button>
         <button onclick="trackCustomPage()">Track Custom Page</button>
-        <button onclick="checkHealth()">Check API Health</button>
         <button onclick="clearConsole()">Clear Console</button>
     </div>
 
@@ -297,24 +296,6 @@
             if (customPath) {
                 showStatus(`📊 Manually tracking: ${customPath}`, 'info');
                 window.trackPageview(customPath, window.location.pathname);
-            }
-        }
-
-        // Check API health
-        async function checkHealth() {
-            try {
-                showStatus('🔍 Checking API health...', 'info');
-                
-                const response = await fetch(HEALTH_API);
-                
-                if (response.ok) {
-                    const health = await response.json();
-                    showStatus(`✅ API is healthy - Tenant: ${health.environment?.tenant}, Flow: ${health.flowType}`, 'success');
-                } else {
-                    showStatus(`❌ API health check failed: ${response.status}`, 'error');
-                }
-            } catch (error) {
-                showStatus(`❌ Health check failed: ${error.message}`, 'error');
             }
         }
     </script>
