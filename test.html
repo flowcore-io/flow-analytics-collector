@@ -57,6 +57,17 @@
             border-radius: 3px;
             font-family: 'Monaco', 'Consolas', monospace;
         }
+        .console-log {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            margin: 1rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -64,20 +75,27 @@
     
     <div class="container">
         <h2>Analytics Collection Test</h2>
-        <p>This page demonstrates the Flowcore Analytics Collector. It automatically tracks a pageview when loaded and provides buttons to test manual tracking.</p>
+        <p>This page demonstrates the Flowcore Analytics Collector with automatic pageview tracking. The script automatically tracks pageviews and provides buttons to test manual tracking.</p>
         
         <div>
             <strong>Current Page:</strong> <code id="current-path"></code><br>
             <strong>Referrer:</strong> <code id="current-referrer"></code><br>
-            <strong>API Endpoint:</strong> <code>http://localhost:3000/api/pageview</code>
+            <strong>API Endpoint:</strong> <code>http://localhost:3000/api/pageview</code><br>
+            <strong>Auto-tracking:</strong> <code>✅ Enabled</code>
         </div>
     </div>
 
     <div class="container">
         <h3>Manual Tracking</h3>
-        <button onclick="trackPageview()">Track Current Page</button>
+        <button onclick="window.trackPageview()">Track Current Page</button>
         <button onclick="trackCustomPage()">Track Custom Page</button>
         <button onclick="checkHealth()">Check API Health</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div class="container">
+        <h3>Debug Console</h3>
+        <div id="console-output" class="console-log"></div>
     </div>
 
     <div id="status-container"></div>
@@ -94,8 +112,165 @@
     </div>
 
     <script>
-        // Analytics configuration
-        const ANALYTICS_API = 'http://localhost:3000/api/pageview';
+        // Enhanced console logging for the page
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsoleLog = console.log;
+        const originalConsoleWarn = console.warn;
+        const originalConsoleDebug = console.debug;
+
+        function addToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.marginBottom = '0.25rem';
+            
+            const typeColors = {
+                log: '#90cdf4',
+                warn: '#fbb6ce', 
+                debug: '#fbb6ce',
+                error: '#fc8181'
+            };
+            
+            div.innerHTML = `<span style="color: #a0aec0">[${timestamp}]</span> <span style="color: ${typeColors[type] || '#e2e8f0'}">${message}</span>`;
+            consoleOutput.appendChild(div);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+
+        console.debug = function(...args) {
+            originalConsoleDebug.apply(console, args);
+            addToConsole(args.join(' '), 'debug');
+        };
+
+        function clearConsole() {
+            consoleOutput.innerHTML = '';
+        }
+
+        // Simple Pageview Tracker - JavaScript Version
+        // Tracks only page navigation with pathname and referrer
+        (() => {
+            const config = {
+                endpoint: "http://localhost:3000/api/pageview",
+                domain: window.location.hostname,
+                debug: true
+            };
+
+            // Simple function to send pageview data
+            const sendPageview = async (pathname, referrer) => {
+                if (!window.fetch) return;
+                
+                const eventData = {
+                    pathname,
+                    referrer,
+                    domain: config.domain,
+                };
+
+                if (config.debug) {
+                    console.log(`📄 Pageview: ${pathname}`, eventData);
+                }
+
+                try {
+                    const response = await fetch(config.endpoint, {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        keepalive: true,
+                        body: JSON.stringify(eventData)
+                    });
+                    
+                    if (config.debug && !response.ok) {
+                        console.warn(`Pageview tracking failed: ${response.status}`);
+                    } else if (config.debug && response.ok) {
+                        console.log(`✅ Pageview successfully sent to server`);
+                    }
+                } catch (error) {
+                    if (config.debug) {
+                        console.debug('Pageview tracking failed:', error);
+                    }
+                }
+            };
+
+            // Set up automatic pageview tracking for SPAs
+            const setupPageviewTracking = () => {
+                let lastPathname;
+                
+                const triggerPageview = (force = false) => {
+                    const currentPathname = window.location.pathname;
+                    
+                    if (force || lastPathname !== currentPathname) {
+                        const referrer = lastPathname 
+                            ? `${window.location.origin}${lastPathname}` 
+                            : document.referrer;
+                        lastPathname = currentPathname;
+                        sendPageview(currentPathname, referrer);
+                    }
+                };
+
+                const triggerPageviewImmediate = () => triggerPageview(true);
+
+                // Hook into pushState for SPA navigation detection (Next.js Link clicks)
+                if (window.history?.pushState) {
+                    const originalPushState = window.history.pushState;
+                    window.history.pushState = function(data, unused, url) {
+                        originalPushState.call(this, data, unused, url);
+                        triggerPageviewImmediate();
+                    };
+                }
+
+                // Handle browser back/forward navigation
+                window.addEventListener("popstate", triggerPageviewImmediate);
+
+                // Handle initial page load based on visibility
+                const currentVisibilityState = document.visibilityState;
+                const isHidden = currentVisibilityState === "hidden";
+                
+                if (isHidden) {
+                    const handleVisibilityChange = () => {
+                        if (!lastPathname && document.visibilityState === "visible") {
+                            triggerPageview();
+                        }
+                    };
+                    document.addEventListener("visibilitychange", handleVisibilityChange);
+                } else {
+                    triggerPageview();
+                }
+
+                // Handle page show events (back/forward cache)
+                const handlePageShow = (event) => {
+                    if (event.persisted) {
+                        triggerPageview();
+                    }
+                };
+                window.addEventListener("pageshow", handlePageShow);
+            };
+
+            // Initialize the tracker
+            const initialize = () => {
+                if (config.debug) {
+                    console.log(`🚀 Simple pageview tracker initialized for domain: ${config.domain}`);
+                    console.log(`📡 Sending pageviews to: ${config.endpoint}`);
+                }
+                
+                setupPageviewTracking();
+                
+                // Set up global function for manual tracking if needed
+                window.trackPageview = (pathname, referrer) => {
+                    sendPageview(pathname ?? window.location.pathname, referrer ?? "");
+                };
+            };
+
+            // Start tracking
+            initialize();
+        })();
+
+        // Additional test functions for the UI
         const HEALTH_API = 'http://localhost:3000/health';
 
         // Update page info
@@ -116,38 +291,12 @@
             }, 5000);
         }
 
-        // Track a pageview
-        async function trackPageview(pathname = window.location.pathname, referrer = document.referrer) {
-            try {
-                showStatus('📊 Sending analytics event...', 'info');
-                
-                const response = await fetch(ANALYTICS_API, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        pathname: pathname,
-                        referrer: referrer || ""
-                    })
-                });
-
-                if (response.ok) {
-                    showStatus(`✅ Successfully tracked pageview: ${pathname}`, 'success');
-                } else {
-                    const error = await response.text();
-                    showStatus(`❌ Failed to track pageview: ${response.status} - ${error}`, 'error');
-                }
-            } catch (error) {
-                showStatus(`❌ Network error: ${error.message}`, 'error');
-            }
-        }
-
         // Track a custom page for testing
         async function trackCustomPage() {
             const customPath = prompt('Enter a custom page path to track:', '/custom-test-page');
             if (customPath) {
-                await trackPageview(customPath, window.location.pathname);
+                showStatus(`📊 Manually tracking: ${customPath}`, 'info');
+                window.trackPageview(customPath, window.location.pathname);
             }
         }
 
