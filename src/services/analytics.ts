@@ -4,6 +4,7 @@ import { FlowcoreAnalytics, pathways } from "../pathways";
 
 // Input validation schema for incoming analytics events
 export const AnalyticsPageviewInputSchema = z.strictObject({
+  domain: z.string(),
   pathname: z.string(),
   referrer: z.string(),
 });
@@ -37,6 +38,7 @@ export class AnalyticsService {
       // This will trigger the handler after successful emission
       console.log("🔄 Writing visitor-tracked event to Flowcore:", {
         visitorHash,
+        domain: validatedInput.domain,
         pathname: validatedInput.pathname,
         referrer: validatedInput.referrer,
         sessionContext: {
@@ -49,6 +51,7 @@ export class AnalyticsService {
         {
           data: {
             visitorHash,
+            domain: validatedInput.domain,
             pathname: validatedInput.pathname,
             referrer: validatedInput.referrer,
             sessionContext: {

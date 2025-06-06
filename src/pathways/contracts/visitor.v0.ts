@@ -14,6 +14,7 @@ export const EventVisitorTrackedEventSchema = z.strictObject({
   visitorHash: z.string().length(64, "Visitor hash must be 64 characters"),
 
   // Page/Event details
+  domain: z.string(),
   pathname: z.string(),
   referrer: z.string(), // The page that linked to the current page
 
