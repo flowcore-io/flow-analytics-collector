@@ -1,13 +1,8 @@
 import cors from "@elysiajs/cors";
 import swagger from "@elysiajs/swagger";
-import type { FlowcoreLegacyEvent } from "@flowcore/pathways";
 import { Elysia } from "elysia";
 import env from "./env/server";
-import { pathwaysRouter } from "./pathways/pathways";
-import { type AnalyticsPageviewUserInput, AnalyticsService } from "./services/analytics";
-
-// Initialize services
-const analyticsService = new AnalyticsService();
+import { analyticsRoutes, healthRoutes, transformerRoutes } from "./routes";
 
 const app = new Elysia()
   // Add CORS support for cross-domain analytics requests
@@ -43,80 +38,9 @@ const app = new Elysia()
     })
   )
 
-  // Flowcore transformer endpoint - handles webhook events from Flowcore
-  .post(
-    "/api/transformer",
-    async ({ body, headers, set }) => {
-      try {
-        const event = body as unknown as FlowcoreLegacyEvent;
-        const secret = headers["x-secret"] ?? "";
-
-        await pathwaysRouter.processEvent(event, secret);
-        set.status = 200;
-        return "OK";
-      } catch (error) {
-        console.error("❌ Error processing Flowcore event:", error);
-        set.status = 500;
-        return { error: (error as Error).message };
-      }
-    },
-    {
-      tags: ["Transformer"],
-      summary: "Flowcore event transformer",
-      description: "Receives and processes events from Flowcore via webhooks",
-    }
-  )
-
-  // Main analytics event collection endpoint
-  .post(
-    "/api/pageview",
-    async ({ body, headers, set }) => {
-      try {
-        const result = await analyticsService.processPageview(
-          body as AnalyticsPageviewUserInput,
-          headers
-        );
-
-        if (result.success) {
-          set.status = 204; // No Content - standard for analytics
-          return;
-        }
-        set.status = 400;
-        return { error: result.error };
-      } catch (error) {
-        console.error("Error in /api/event:", error);
-        set.status = 500;
-        return { error: "Internal server error" };
-      }
-    },
-    {
-      tags: ["Analytics"],
-      summary: "Track page view or custom event",
-      description:
-        "Accepts analytics events, generates privacy-safe visitor hash, and emits to Flowcore",
-    }
-  )
-
-  // Root endpoint
-  .get(
-    "/",
-    () => ({
-      service: "Flowcore Analytics Collector",
-      version: "1.0.0",
-      status: "running",
-      endpoints: {
-        health: "/health",
-        docs: "/swagger",
-        transformer: "/api/transformer",
-        pageview: "/api/pageview",
-      },
-    }),
-    {
-      tags: ["Health"],
-      summary: "Service information",
-      description: "Returns basic service information and available endpoints",
-    }
-  )
+  // Register route groups
+  .use(healthRoutes)
+  .group("/api", (app) => app.use(analyticsRoutes).use(transformerRoutes))
 
   .listen(Number.parseInt(env.PORT));
 
