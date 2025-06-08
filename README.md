@@ -34,7 +34,7 @@ cp env.example .env
 
 ### 3. Set Up Flowcore Resources
 
-Update `flowcore.yaml` and `flowcore.local.yaml` with your tenant name.
+Update `flowcore.yaml` with your tenant name and then run this command:
 
 ```bash
 bun flowcore:apply:data-core

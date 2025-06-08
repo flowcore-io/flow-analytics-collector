@@ -1,10 +1,14 @@
 development:
+  # this creates local proxyEndpoints/transformers for local development.
+  # Events received by the Flowcore Platform are fanned out to the specified endpoints.
   proxyEndpoints:
     analytics:
       description: "Analytics transformer for local development"
       dataCore: flow-analytics
       flowType: visitor.v0
-      events:
+      events: # these are your Event Types
+        # Events sent to visitor.tracked.v0 are sent to the endpoints you specify here.
+        # visitor.tracker.v0 is an Event Type which is an append-only event log managed on the Flowcore Platform
         - visitor.tracked.v0
       endpoints:
         - ""

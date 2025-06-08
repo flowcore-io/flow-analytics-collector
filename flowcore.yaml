@@ -11,6 +11,8 @@ dataCore:
       eventTypes:
         visitor.tracked.v0:
           description: "Privacy-safe visitor tracking event with daily rotating hash"
+
+# if you want to deploy proxyEndpoints/transformers to production you can use this snippet.
 scenario:
   name: example-scenario
   description: "An example scenario"
