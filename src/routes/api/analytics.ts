@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { type AnalyticsPageviewUserInput, AnalyticsService } from "../services/analytics";
+import { type AnalyticsPageviewUserInput, AnalyticsService } from "../../services/analytics";
 
 // Initialize the analytics service
 const analyticsService = new AnalyticsService();

@@ -19,17 +19,4 @@ export const healthRoutes = new Elysia({ name: "health" })
       summary: "Service information",
       description: "Returns basic service information and available endpoints",
     }
-  )
-  .get(
-    "/health",
-    () => ({
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-    }),
-    {
-      tags: ["Health"],
-      summary: "Health check",
-      description: "Returns service health status",
-    }
-  );
+  ) 

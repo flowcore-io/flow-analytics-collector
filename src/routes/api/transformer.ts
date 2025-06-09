@@ -1,6 +1,6 @@
 import type { FlowcoreLegacyEvent } from "@flowcore/pathways";
 import { Elysia } from "elysia";
-import { pathwaysRouter } from "../pathways/pathways";
+import { pathwaysRouter } from "../../pathways/pathways";
 
 export const transformerRoutes = new Elysia({ name: "transformer" })
   .post(

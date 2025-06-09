@@ -1,3 +1,5 @@
-export { healthRoutes } from "./health";
-export { analyticsRoutes } from "./analytics";
-export { transformerRoutes } from "./transformer"; 
+// System routes
+export { healthRoutes } from "./system";
+
+// API routes  
+export { analyticsRoutes, transformerRoutes } from "./api"; 
