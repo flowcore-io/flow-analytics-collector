@@ -1,5 +1,10 @@
+# This manifest file is used to create resources on the Flowcore Platform using a CLI.
+# You can also create resources using the Web UI.
+
 version: 1
-tenant: your-tenant-name  # Replace with your actual tenant name
+# for this I suggest you create a tenant with your application's name or your org's name
+# the tenant has to exist on the Flowcore Platform before you apply this manifest
+tenant: your-tenant-name  # <----------------- Replace with your actual tenant name
 dataCore:
   name: flow-analytics
   deleteProtection: true
@@ -13,6 +18,7 @@ dataCore:
           description: "Privacy-safe visitor tracking event with daily rotating hash"
 
 # if you want to deploy proxyEndpoints/transformers to production you can use this snippet.
+# you can call "flowcore scenario apply -f flowcore.yaml" or "flowcore apply -f flowcore.yaml" if you want to apply the entire manifest file
 scenario:
   name: example-scenario
   description: "An example scenario"
